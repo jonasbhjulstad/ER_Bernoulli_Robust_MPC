@@ -8,10 +8,10 @@
 		},
 		"paths" : 
 		{
-			"cmake" : "/usr/bin/cmake",
-			"cpack" : "/usr/bin/cpack",
-			"ctest" : "/usr/bin/ctest",
-			"root" : "/usr/share/cmake"
+			"cmake" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/bin/cmake",
+			"cpack" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/bin/cpack",
+			"ctest" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/bin/ctest",
+			"root" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/share/cmake-3.24"
 		},
 		"version" : 
 		{
@@ -26,7 +26,7 @@
 	"objects" : 
 	[
 		{
-			"jsonFile" : "codemodel-v2-57dadc90713a45f96ecc.json",
+			"jsonFile" : "codemodel-v2-9f2b9f1fef7a0e8ec2ef.json",
 			"kind" : "codemodel",
 			"version" : 
 			{
@@ -35,7 +35,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cache-v2-4ed9cb8f4128a4777b74.json",
+			"jsonFile" : "cache-v2-c64d10d80f9fbbd96d5a.json",
 			"kind" : "cache",
 			"version" : 
 			{
@@ -44,7 +44,7 @@
 			}
 		},
 		{
-			"jsonFile" : "cmakeFiles-v1-51e6bc3ba830115a50ac.json",
+			"jsonFile" : "cmakeFiles-v1-e160ba065f51ebd29730.json",
 			"kind" : "cmakeFiles",
 			"version" : 
 			{
@@ -53,7 +53,7 @@
 			}
 		},
 		{
-			"jsonFile" : "toolchains-v1-864302bf5cb21595b6ac.json",
+			"jsonFile" : "toolchains-v1-61024cf2e30081fdea2b.json",
 			"kind" : "toolchains",
 			"version" : 
 			{
@@ -90,7 +90,7 @@
 				"responses" : 
 				[
 					{
-						"jsonFile" : "cache-v2-4ed9cb8f4128a4777b74.json",
+						"jsonFile" : "cache-v2-c64d10d80f9fbbd96d5a.json",
 						"kind" : "cache",
 						"version" : 
 						{
@@ -99,7 +99,7 @@
 						}
 					},
 					{
-						"jsonFile" : "codemodel-v2-57dadc90713a45f96ecc.json",
+						"jsonFile" : "codemodel-v2-9f2b9f1fef7a0e8ec2ef.json",
 						"kind" : "codemodel",
 						"version" : 
 						{
@@ -108,7 +108,7 @@
 						}
 					},
 					{
-						"jsonFile" : "toolchains-v1-864302bf5cb21595b6ac.json",
+						"jsonFile" : "toolchains-v1-61024cf2e30081fdea2b.json",
 						"kind" : "toolchains",
 						"version" : 
 						{
@@ -117,7 +117,7 @@
 						}
 					},
 					{
-						"jsonFile" : "cmakeFiles-v1-51e6bc3ba830115a50ac.json",
+						"jsonFile" : "cmakeFiles-v1-e160ba065f51ebd29730.json",
 						"kind" : "cmakeFiles",
 						"version" : 
 						{

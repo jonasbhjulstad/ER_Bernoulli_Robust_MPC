@@ -23,7 +23,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = /usr/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild -B/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild
+  command = /home/man/.local/lib/python3.9/site-packages/cmake/data/bin/cmake --regenerate-during-build -S/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild -B/home/man/Documents/Bernoulli_MC/build/_deps/googletest-subbuild
   description = Re-running CMake...
   generator = 1
 

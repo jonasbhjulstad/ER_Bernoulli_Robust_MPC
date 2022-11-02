@@ -115,7 +115,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/usr/bin/cmake"
+			"value" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/bin/cmake"
 		},
 		{
 			"name" : "CMAKE_CPACK_COMMAND",
@@ -127,7 +127,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/usr/bin/cpack"
+			"value" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/bin/cpack"
 		},
 		{
 			"name" : "CMAKE_CTEST_COMMAND",
@@ -139,7 +139,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/usr/bin/ctest"
+			"value" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/bin/ctest"
 		},
 		{
 			"name" : "CMAKE_CXX_COMPILER",
@@ -151,10 +151,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "CXX compiler"
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "STRING",
 			"value" : "/usr/bin/clang++"
 		},
 		{
@@ -279,10 +279,10 @@
 				},
 				{
 					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
+					"value" : "C compiler"
 				}
 			],
-			"type" : "FILEPATH",
+			"type" : "STRING",
 			"value" : "/usr/bin/clang"
 		},
 		{
@@ -412,18 +412,6 @@
 			],
 			"type" : "FILEPATH",
 			"value" : "/usr/bin/llvm-dlltool"
-		},
-		{
-			"name" : "CMAKE_EDIT_COMMAND",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "Path to cache edit program executable."
-				}
-			],
-			"type" : "INTERNAL",
-			"value" : "/usr/bin/ccmake"
 		},
 		{
 			"name" : "CMAKE_EXECUTABLE_FORMAT",
@@ -1227,7 +1215,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "/usr/share/cmake"
+			"value" : "/home/man/.local/lib/python3.9/site-packages/cmake/data/share/cmake-3.24"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -1799,7 +1787,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "general;Common;general;TBB::tbb;general;Regressors;general;FROLS_Math;general;Features;general;DataFrame;general;FROLS_Eigen;general;TBB::tbb;general;/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so;"
+			"value" : "general;Common;general;TBB::tbb;general;Regressors;general;FROLS_Math;general;Features;general;DataFrame;general;FROLS_Eigen;general;/home/man/.pyenv/versions/3.9.13/lib/libpython3.9.so;"
 		},
 		{
 			"name" : "FROLS_DATA_DIR",
@@ -2267,7 +2255,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/opt/intel/oneapi/intelpython/latest/bin/protoc"
+			"value" : "/usr/local/bin/protoc"
 		},
 		{
 			"name" : "Protobuf_PROTOC_LIBRARY_DEBUG",
@@ -2359,7 +2347,7 @@
 				}
 			],
 			"type" : "PATH",
-			"value" : "/usr/lib64/cmake/TBB"
+			"value" : "/usr/local/lib/cmake/tbb-2021.7.0"
 		},
 		{
 			"name" : "ZLIB_INCLUDE_DIR",

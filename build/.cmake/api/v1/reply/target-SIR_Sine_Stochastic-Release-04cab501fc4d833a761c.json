@@ -31,7 +31,7 @@
 			"CMakeLists.txt",
 			"/usr/local/lib/cmake/absl/abslTargets.cmake",
 			"/usr/local/lib/cmake/absl/abslConfig.cmake",
-			"/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+			"/home/man/.local/lib/python3.9/site-packages/cmake/data/share/cmake-3.24/Modules/CMakeFindDependencyMacro.cmake",
 			"/usr/local/lib/cmake/Cbc/CbcTargets.cmake",
 			"/usr/local/lib/cmake/Cbc/CbcConfig.cmake",
 			"/usr/local/lib/cmake/ortools/modules/FindCbc.cmake",
@@ -399,7 +399,7 @@
 			{
 				"command" : 8,
 				"file" : 4,
-				"line" : 66,
+				"line" : 77,
 				"parent" : 8
 			},
 			{
@@ -533,6 +533,11 @@
 				{
 					"backtrace" : 4,
 					"isSystem" : true,
+					"path" : "/opt/intel/oneapi/tbb/2021.7.0/include"
+				},
+				{
+					"backtrace" : 4,
+					"isSystem" : true,
 					"path" : "/usr/local/include/coin"
 				}
 			],
@@ -593,7 +598,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-Wl,-rpath,/home/man/.pyenv/versions/3.9.13/lib:/usr/local/lib",
+				"fragment" : "-Wl,-rpath,/home/man/.pyenv/versions/3.9.13/lib:/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8:/usr/local/lib",
 				"role" : "libraries"
 			},
 			{
@@ -648,7 +653,7 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "/usr/lib/libtbb.so.12.5",
+				"fragment" : "/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb.so.12",
 				"role" : "libraries"
 			},
 			{

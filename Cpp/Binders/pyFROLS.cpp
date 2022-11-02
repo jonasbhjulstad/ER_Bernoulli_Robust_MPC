@@ -205,7 +205,7 @@ PYBIND11_MODULE(pyFROLS, m) {
   m.def("generate_SIR_ER_graph", &generate_SIR_ER_graph);
   m.def("generate_Bernoulli_SIR_Network",
         py::overload_cast<Network_Models::SIR_VectorGraph &, float, uint32_t,
-                          float>(&generate_Bernoulli_SIR_Network));
+                          float, uint32_t>(&generate_Bernoulli_SIR_Network));
   // m.def("generate_Bernoulli_SIR_Network", py::overload_cast<uint32_t, float,
   // float, uint32_t, float>(&generate_Bernoulli_SIR_Network));
   m.def("traj_to_file", &traj_to_file<float>);

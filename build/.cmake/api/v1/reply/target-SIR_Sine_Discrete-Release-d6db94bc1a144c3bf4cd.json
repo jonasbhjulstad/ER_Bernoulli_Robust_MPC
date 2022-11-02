@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Executables/Generate/Bernoulli_SIR_MC"
+			"path" : "Executables/Generate/SIR_Sine_Discrete"
 		}
 	],
 	"backtrace" : 2,
@@ -31,7 +31,7 @@
 			"CMakeLists.txt",
 			"/usr/local/lib/cmake/absl/abslTargets.cmake",
 			"/usr/local/lib/cmake/absl/abslConfig.cmake",
-			"/usr/share/cmake/Modules/CMakeFindDependencyMacro.cmake",
+			"/home/man/.local/lib/python3.9/site-packages/cmake/data/share/cmake-3.24/Modules/CMakeFindDependencyMacro.cmake",
 			"/usr/local/lib/cmake/Cbc/CbcTargets.cmake",
 			"/usr/local/lib/cmake/Cbc/CbcConfig.cmake",
 			"/usr/local/lib/cmake/ortools/modules/FindCbc.cmake",
@@ -47,7 +47,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 11,
+				"line" : 22,
 				"parent" : 0
 			},
 			{
@@ -399,7 +399,7 @@
 			{
 				"command" : 8,
 				"file" : 4,
-				"line" : 66,
+				"line" : 77,
 				"parent" : 8
 			},
 			{
@@ -533,6 +533,11 @@
 				{
 					"backtrace" : 4,
 					"isSystem" : true,
+					"path" : "/opt/intel/oneapi/tbb/2021.7.0/include"
+				},
+				{
+					"backtrace" : 4,
+					"isSystem" : true,
 					"path" : "/usr/local/include/coin"
 				}
 			],
@@ -579,7 +584,7 @@
 			"id" : "Regressors::@f1e7241e55aed8935b50"
 		}
 	],
-	"id" : "Bernoulli_SIR_MC::@68a3a1e162b02809d69b",
+	"id" : "SIR_Sine_Discrete::@68a3a1e162b02809d69b",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -593,7 +598,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "-Wl,-rpath,/home/man/.pyenv/versions/3.9.13/lib:/usr/local/lib",
+				"fragment" : "-Wl,-rpath,/home/man/.pyenv/versions/3.9.13/lib:/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8:/usr/local/lib",
 				"role" : "libraries"
 			},
 			{
@@ -648,7 +653,7 @@
 			},
 			{
 				"backtrace" : 4,
-				"fragment" : "/usr/lib/libtbb.so.12.5",
+				"fragment" : "/opt/intel/oneapi/tbb/2021.7.0/lib/intel64/gcc4.8/libtbb.so.12",
 				"role" : "libraries"
 			},
 			{
@@ -1044,8 +1049,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "Bernoulli_SIR_MC",
-	"nameOnDisk" : "Bernoulli_SIR_MC",
+	"name" : "SIR_Sine_Discrete",
+	"nameOnDisk" : "SIR_Sine_Discrete",
 	"paths" : 
 	{
 		"build" : "Executables/Generate",
@@ -1066,7 +1071,7 @@
 		{
 			"backtrace" : 2,
 			"compileGroupIndex" : 0,
-			"path" : "Executables/Generate/Bernoulli_SIR_MC.cpp",
+			"path" : "Executables/Generate/SIR_Sine_Discrete.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

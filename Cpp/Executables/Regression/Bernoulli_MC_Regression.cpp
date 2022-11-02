@@ -35,7 +35,7 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
 static bool qr_invoked = false;
 using namespace Eigen;
 const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
-constexpr uint32_t Nt = 50;
+constexpr uint32_t Nt = 50; 
 constexpr uint32_t N_sims = 50;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
@@ -140,7 +140,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     FROLS::Regression::Quantile_Param qr_param;
     qr_param.N_terms_max = N_terms_max;
     qr_param.tol = MAE_tol;
-    qr_param.tau = 1-tau;
+    qr_param.tau = tau;
     qr_param.theta_tol = 1e-3;
     qr_param.N_rows = X_list[0].rows();
     //Regressor for S
@@ -220,7 +220,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    std::vector<float> N_pop_vec = {20};
+    std::vector<float> N_pop_vec = {200};
     std::vector<float> p_ER_vec = {0.1, 0.5,1.0};
     std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());

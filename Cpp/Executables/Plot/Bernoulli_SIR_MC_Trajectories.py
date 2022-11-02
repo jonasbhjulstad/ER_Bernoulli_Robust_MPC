@@ -21,14 +21,14 @@ if __name__ == '__main__':
     csv_model = DATA_DIR + '/model.csv'
 
 
-    N_pop = 100
+    N_pop = 200
 
     # find all csv in data_path
     files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_" + str(N_pop) + "_1/*.csv")
     # files = glob.glob(DATA_DIR + "SIR_Sine_Trajectory_Discrete_*.csv")
     #sort q_files according to float in name
     fig, ax = plt.subplots(4)
-    dfs = [pd.read_csv(f, delimiter=",") for f in files[:100]]
+    dfs = [pd.read_csv(f, delimiter=",") for f in files[:50]]
     
 
     I = np.zeros_like(dfs[0]["S"].to_numpy())

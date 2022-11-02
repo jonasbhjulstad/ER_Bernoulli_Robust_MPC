@@ -53,8 +53,11 @@ namespace FROLS
         // omega = 0;
         std::vector<dType> beta(Nt);
         R0_mean = 1.5;
-        std::exponential_distribution<dType> d_exp(1);
-        dType p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+        // std::exponential_distribution<dType> d_exp(1);
+        random::uniform_real_distribution<dType> d_R0(0, 0.01);
+        // dType p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+        // dType p_I_val = d_R0(rng)/p.N_pop;
+        dType p_I_val = d_R0(rng);
         std::for_each(p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
                       {
             dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
@@ -62,7 +65,9 @@ namespace FROLS
             p_I = p_I_val;
             if ((t % 7) == 0)
             {
-                p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+                // p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+                // p_I_val = d_R0(rng)/p.N_pop;
+                p_I_val = d_R0(rng);
             }
             t++; });
         return p_Is;
@@ -90,7 +95,7 @@ namespace FROLS
     std::vector<Network_Models::SIR_Param<>> fixed_interaction_probabilities(const MC_SIR_Params<> &p, const std::vector<float> &p_Is, uint32_t Nt)
     {
         std::vector<Network_Models::SIR_Param<>> param_vec(Nt);
-        std::for_each(std::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
+        std::for_each(FROLS::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
                       {
             p_SIR.p_I = p_Is[t];
             p_SIR.p_R = 1 - std::exp(-p.alpha);
@@ -170,14 +175,19 @@ namespace FROLS
     }
 
     Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float>
-    generate_Bernoulli_SIR_Network(Network_Models::SIR_VectorGraph &G_structure, float p_I0, uint32_t seed, float p_R0 = 0.f)
+    generate_Bernoulli_SIR_Network(Network_Models::SIR_VectorGraph &G_structure, float p_I0, uint32_t seed, float p_R0 = 0.f,  uint32_t N_initialization_attempts = 20)
     {
         random::default_rng generator(seed);
         Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_structure, p_I0, p_R0,
                                                                                    generator);
+        for (int i = 0; i < N_initialization_attempts; i++)
+        {
         G.reset();
         G.initialize();
-        return G;
+        if (G.population_count()[1] > 0)
+            return G;
+        }
+        std::cout << "Warning: Unable to generate initial infections." << std::endl;
     }
 
     MC_SIR_VectorData

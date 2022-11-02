@@ -89,7 +89,7 @@ def uncontrolled_trajectory_generation(N_pop, p_ER):
     seeds = [random.randint(0, 1000000) for i in range(N_sims)]
 
     G_structure = pf.generate_SIR_ER_graph(N_pop, p_ER, seed)
-    G = pf.generate_Bernoulli_SIR_Network(G_structure, p_I0, seed, 0)
+    G = pf.generate_Bernoulli_SIR_Network(G_structure, p_I0, seed, 0, 20)
     G_mpc = G
     #generate integer seeds
     seeds = [random.randint(0, 1000000) for i in range(N_sims)]
@@ -106,7 +106,7 @@ def uncontrolled_trajectory_generation(N_pop, p_ER):
     return uncontrolled_data, rd
 
 
-def openloop_solve(uc_data, rd, regressor, model, N_sims, Nt, Wu, file_prefix = ''):
+def openloop_solve(uc_data, rd, regressor, model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix = ''):
 
     # feature_S = regressor.transform_fit(rd.X, rd.U, rd.Y[:,0], model)
     # feature_I = regressor.transform_fit(rd.X, rd.U, rd.Y[:,1], model)
@@ -143,12 +143,7 @@ def openloop_solve(uc_data, rd, regressor, model, N_sims, Nt, Wu, file_prefix = 
 
     return openloop_data
 
-def openloop_solve_from_csv(rd, param_filename, model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix = ''):
-
-    # feature_S = regressor.transform_fit(rd.X, rd.U, rd.Y[:,0], model)
-    # feature_I = regressor.transform_fit(rd.X, rd.U, rd.Y[:,1], model)
-    # feature_R = regressor.transform_fit(rd.X, rd.U, rd.Y[:,2], model)
-    # features = [feature_S, feature_I, feature_R]
+def openloop_solve_from_csv(uc_data, rd, param_filename, model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix = ''):
 
 
     features = model.read_csv(param_filename)
@@ -158,12 +153,11 @@ def openloop_solve_from_csv(rd, param_filename, model, N_sims, Nt, Wu, N_pop, p_
     x = cs.MX.sym('x', 3)
     u = cs.MX.sym('u', 1)
 
-    xdot = cs.vertcat(*construct_mx_equations(x, u, er_model, features))
+    xdot = cs.vertcat(*construct_mx_equations(x, u, model, features))
     #Quantile Regression and optimiation
     F_ODE = cs.Function("F_ODE", [x, u], [xdot])
     log_filename = DATA_DIR + '/latex/log/' + file_prefix + 'week_objective_solve_{}_{}.txt'.format(N_pop, p_ER)    
     sol, u_sol, x_pred, stats = week_objective_solve(rd.X[0], rd.U[0], Wu, F_ODE, Nt, N_pop, log_file=log_filename)
-    # x_pred = model.simulate(rd.X[0][0,:], u_sol, Nt, features)
     #MPC simulations
 
     mpc_sir_p = [pf.SIR_Param() for i in range(Nt)]
@@ -184,10 +178,10 @@ def openloop_solve_from_csv(rd, param_filename, model, N_sims, Nt, Wu, N_pop, p_
 
 # %%
 seed = random.randint(0, 1000000)
-Wu = 50
+Wu = 1
 uc_datas = []
 G_param_pairs = []
-N_pops = reversed([10, 50, 100])
+N_pops = [20, 50, 100]
 p_ERs = [0.1, 0.5, 1.0]
 t = np.array(range(Nt))
 uncontrolled_traj_fname = lambda p: DATA_DIR + '/latex/Figures/MPC_Trajectory_comparison_{}_{}.pdf'.format(p[0], p[1])
@@ -208,14 +202,8 @@ for p in G_param_pairs:
     uc_filename = DATA_DIR + '/Bernoulli_SIR_MC_{}_{}/regression_data.csv'.format(p[0], p_str)
     er_param_filename = DATA_DIR + '/ERR_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
     qr_param_filename = DATA_DIR + '/Quantile_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
-    er_data = openloop_solve_from_csv(rd, er_param_filename, er_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='er_')
-    qr_data = openloop_solve_from_csv(rd, qr_param_filename, qr_model, N_sims, Nt, Wu, N_pop, p_ER, file_prefix='qr_')
-    # er_data = openloop_solve(uc_data, rd, er_regressor, er_model, N_sims, Nt, Wu, file_prefix='er_')
-    # qr_model.feature_susmmary(er_data['features'])
-    # qr_data = openloop_solve(uc_data, rd, qr_regressor, qr_model, N_sims, Nt, Wu, file_prefix='qr_')
-    # qr_model.feature_summary(qr_data['features'])
-    #plot er_data['x_pred']
-    # _ = [x.plot(t, er_data['x_pred'][i,:t.shape[0]].T, label='ER') for i, x in enumerate(ax)]
+    er_data = openloop_solve_from_csv(uc_data, rd, er_param_filename, er_model, N_sims, Nt, Wu, p[0], p[1], file_prefix='er_')
+    qr_data = openloop_solve_from_csv(uc_data, rd, qr_param_filename, qr_model, N_sims, Nt, Wu, p[0], p[1], file_prefix='qr_')
     mpc_trajectory_plot(p, er_data, qr_data, t, uncontrolled_traj_fname(p))
 
     uc_datas.append(uc_data)

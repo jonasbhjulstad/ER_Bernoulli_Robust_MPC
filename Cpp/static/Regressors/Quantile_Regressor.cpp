@@ -35,6 +35,7 @@ Feature Quantile_Regressor::single_feature_regression(const Vec &x,
       return Feature{std::numeric_limits<float>::infinity(), 0, 0, 0., FEATURE_INVALID};
     }
 
+    float sign = y.sum() > 0 ? 1.0 : -1.0;
 
     using namespace operations_research;
     uint32_t N_rows = x.rows();
@@ -72,7 +73,7 @@ Feature Quantile_Regressor::single_feature_regression(const Vec &x,
     for (int i = 0; i < N_rows; i++) {
       // g[i]->SetCoefficient(theta_pos, x(i));
       // g[i]->SetCoefficient(theta_neg, -x(i));
-      g[i] = solver->MakeRowConstraint(y(i), y(i));
+      g[i] = solver->MakeRowConstraint(sign*y(i), sign*y(i));
       g[i]->SetCoefficient(theta, x(i));
       g[i]->SetCoefficient(u_pos[i], 1);
       g[i]->SetCoefficient(u_neg[i], -1);
@@ -80,24 +81,24 @@ Feature Quantile_Regressor::single_feature_regression(const Vec &x,
     }
     //            MX g = xi * (theta_pos - theta_neg) + u_pos - u_neg - dm_y;
     const bool solver_status = solver->Solve() == MPSolver::OPTIMAL;
-
+    float f = objective->Value();
+    float theta_sol = theta->solution_value();
+    solver->Clear();
     if (solver_status) {
-      float f = objective->Value();
 
       std::vector<float> u_neg_sol(N_rows);
       std::vector<float> u_pos_sol(N_rows);
-      for (int i = 0; i < N_rows; i++) {
-        u_neg_sol[i] = u_neg[i]->solution_value();
-        u_pos_sol[i] = u_pos[i]->solution_value();
-      }
+      // for (int i = 0; i < N_rows; i++) {
+      //   u_neg_sol[i] = u_neg[i]->solution_value();
+      //   u_pos_sol[i] = u_pos[i]->solution_value();
+      // }
 
-      float theta_sol = theta->solution_value();
-      return Feature{f, theta_sol, 0, 0., FEATURE_REGRESSION};
+      return Feature{f, sign*theta_sol, 0, 0., FEATURE_REGRESSION};
     } else {
 
       std::cout << "[Quantile_Regressor] Warning: Quantile regression failed"
                 << std::endl;
-      std::for_each(g.begin(), g.end(), [](auto &gi) { gi->Clear(); });
+      // std::for_each(g.begin(), g.end(), [](auto &gi) { gi->Clear(); });
       return Feature{std::numeric_limits<float>::infinity(), 0, 0, 0., FEATURE_INVALID};
     }
   // }

@@ -155,7 +155,6 @@ def mpc_trajectory_plot(Gp, er_d, qr_d, t, filename):
         _ = [[x.set_xlim(t[0], t[-1]) for x in ax] for ax in axs]
         ax1.set_xlim(t[0], t[-1])
         ax1.legend(custom_lines, custom_labels, loc=1, prop={'size': 6})
-
         fig.savefig(filename, bbox_inches='tight')
         _ = [[x.clear() for x in ax] for ax in axs]
         ax1.clear()

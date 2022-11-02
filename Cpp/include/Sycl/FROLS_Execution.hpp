@@ -18,10 +18,15 @@ namespace FROLS::execution {
     using namespace oneapi::dpl::execution;
     static auto default_policy = dpcpp_default;
 #else
+    #ifdef FROLS_NO_PARALLEL
+    static auto par_unseq = std::execution::seq;
+    static auto par = std::execution::seq;
+    #else
     static auto par_unseq = std::execution::par_unseq;
     static auto par = std::execution::par;
+    #endif
     static auto seq = std::execution::seq;
-    static auto default_policy = std::execution::par_unseq;
+    static auto default_policy = FROLS::execution::par_unseq;
 #endif
 }
 
