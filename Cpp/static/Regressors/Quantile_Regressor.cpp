@@ -45,6 +45,7 @@ namespace FROLS::Regression {
             std::vector<operations_research::MPVariable *> u_neg;
             std::vector<operations_research::MPConstraint *> g;
             operations_research::MPObjective *objective;
+            float sign = y.mean() > 0 ? 1.0 : -1.0;
 
             solver.MakeNumVarArray(N_rows, 0.0, infinity, "u_pos", &u_pos);
             solver.MakeNumVarArray(N_rows, 0.0, infinity, "u_neg", &u_neg);
@@ -53,51 +54,29 @@ namespace FROLS::Regression {
             std::for_each(u_pos.begin(), u_pos.end(),
                         [=](auto u) { objective->SetCoefficient(u, tau); });
             std::for_each(u_neg.begin(), u_neg.end(),
-                        [=](auto u) { objective->SetCoefficient(u, (1-tau)); });
+                        [=](auto u) { objective->SetCoefficient(u, 1-tau); });
             g.resize(N_rows);
             std::for_each(g.begin(), g.end(),
                         [&](auto &gi) { gi = solver.MakeRowConstraint(); });
 
 
-            float eps = 4.f;
-            static int counter = 0;
-            counter++;
             for (int i = 0; i < N_rows; i++) {
-                // g[i]->SetCoefficient(theta_pos, x(i));
-                // g[i]->SetCoefficient(theta_neg, -x(i));
                 g[i]->SetCoefficient(theta, x(i));
                 g[i]->SetCoefficient(u_pos[i], 1);
                 g[i]->SetCoefficient(u_neg[i], -1);
-                g[i]->SetBounds(y[i], y[i]);
+                g[i]->SetBounds(sign*y[i], sign*y[i]);
             }
 //            MX g = xi * (theta_pos - theta_neg) + u_pos - u_neg - dm_y;
             const bool solver_status = solver.Solve() == MPSolver::OPTIMAL;
+            float f = objective->Value();
+            float theta_sol = sign*theta->solution_value();            
             Feature candidate;
             candidate.f_ERR = std::numeric_limits<float>::infinity();
-
+            solver.Clear();
             if (solver_status) {
-                float f = objective->Value();
-
-                std::vector<float> u_neg_sol(N_rows);
-                std::vector<float> u_pos_sol(N_rows);
-                for (int i = 0; i < N_rows; i++) {
-                    u_neg_sol[i] = u_neg[i]->solution_value();
-                    u_pos_sol[i] = u_pos[i]->solution_value();
-                }
-                // float theta_sol = (theta_pos->solution_value() - theta_neg->solution_value());
-                // float theta_pos_sol = theta_pos->solution_value();
-                // float theta_neg_sol = theta_neg->solution_value();
-                float theta_sol = theta->solution_value();
-                // fmt::print("Solve status, {}, {}, {}\n", solver_status, f, theta_sol);
-                // if(theta_sol == 0)
-                    // std::cout << y.head(10).transpose() << std::endl;
-                
-
-                // std::for_each(g.begin(), g.end(), [&](auto &gi) { gi->Clear(); });
                 return Feature{f, theta_sol, 0, 0., FEATURE_REGRESSION};
             } else {
                 std::cout << "[Quantile_Regressor] Warning: Quantile regression failed" << std::endl;
-                // std::for_each(g.begin(), g.end(), [](auto &gi) { gi->Clear(); });
                 return Feature{};
             }
         }

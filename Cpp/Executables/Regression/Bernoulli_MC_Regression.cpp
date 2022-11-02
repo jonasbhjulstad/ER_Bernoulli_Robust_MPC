@@ -113,7 +113,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 
     X = dataframe_to_matrix(dfs, colnames_x,
                             0, -2);
-    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
+    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1) - X;
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
     using namespace FROLS::Features;
@@ -127,7 +127,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 
     X = dataframe_to_matrix(dfs, colnames_x,
                             0, -2);
-    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1);
+    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1) - X;
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
     std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
@@ -136,7 +136,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     FROLS::Regression::Quantile_Param qr_param;
     qr_param.N_terms_max = N_terms_max;
     qr_param.tol = MAE_tol;
-    qr_param.tau = 1-tau;
+    qr_param.tau = tau;
     qr_param.theta_tol = 1e-3;
     qr_param.N_rows = X.rows();
     qr_param.N_threads = 8;

@@ -1,5 +1,6 @@
 import casadi as cs
 import numpy as np
+import os
 from pysindy_casadi_converter import construct_mx_equations
 def quadratic_objective_solve(X_mean, U_mean, Wu, F_ODE, Nt, u_max = 0.1, u_min = 1e-6):
     Nx = X_mean.shape[1]
@@ -40,7 +41,7 @@ def quadratic_objective_solve(X_mean, U_mean, Wu, F_ODE, Nt, u_max = 0.1, u_min 
 
     return (sol, get_X(sol['x'].full()), sol['x'].full())
 
-def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-3, log_file=[]):
+def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-6, log_file=[]):
     Nx = X0.shape[1]
     Nu = 1
 
@@ -50,26 +51,24 @@ def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-3
     g = []
     obj = 0
 
-    gx = []
     obj = 0
     X_traj = [X0[0,:]]
-    Xs = cs.MX.sym('Xs', Nx)
     obj = 0
     week_idx = 0
     for i in range(Nt):
         if (i == 0):
-            Xk = F_ODE(X0[0,:], U[np.min(week_idx, U.shape[0]-1)])
+            Xk = X0[0,:] + F_ODE(X0[0,:], U[week_idx])
         else:
             if (i % 7 == 0):
                 week_idx += 1
-            Xk = F_ODE(Xk, U[week_idx])
+                week_idx = np.min([week_idx, U.shape[1]-1])
+            Xk = Xk + F_ODE(Xk, U[week_idx])
         X_traj.append(Xk)
-        obj += Wu*(u_max - U[week_idx])**2 + (Xk[1])**2/N_pop
+        # obj += Wu*(u_max - U[week_idx])**2 + (Xk[1])**2/N_pop
+        obj += -Wu*(U[week_idx] - u_max) + (Xk[1])/N_pop
         # obj += Wu*cs.norm_2(u_max - U[week_idx]) + cs.norm_2(Xk[1])/N_pop
     get_X = cs.Function('get_X', [U], [cs.horzcat(*X_traj)])
 
-    X0 = X0
-    # U0 = U0[::7][:U.shape[0]]
     # prob = {'f': obj, 'x': W, 'g': g}
     # solver = cs.nlpsol('solver', 'ipopt', prob)
     lbx = [u_min]*U.shape[0]
@@ -81,13 +80,19 @@ def week_objective_solve(X0, U0, Wu, F_ODE, Nt, N_pop, u_max = 0.1, u_min = 1e-3
         opts['ipopt.output_file'] = log_file
         opts['ipopt.file_print_level'] = 5
     prob = {'f': obj, 'x': U, 'g': []}
+    
+    # get parent directory name of logfile
+    parent_dir = os.path.dirname(log_file)
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
 
     solver = cs.nlpsol('solver', 'ipopt', prob, opts)
 
     sol = solver(x0=U0, lbx = cs.vertcat(*lbx), ubx = cs.vertcat(*ubx))
     stats = solver.stats()
+    x_pred = get_X(sol['x']).full().T
 
-    return (sol, get_X(sol['x'].full()), np.array([np.repeat(sol['x'].full(), 7)]).T[:Nt], stats)
+    return (sol, np.array([np.repeat(sol['x'].full(), 7)]).T[:Nt], x_pred, stats)
 
 def hospital_capacity_objective_solve(X_mean, U_mean, Wu, I_max, F_ODE,Nt,  u_max = 0.1, u_min = 1e-6):
     Nx = X_mean.shape[1]
@@ -101,14 +106,12 @@ def hospital_capacity_objective_solve(X_mean, U_mean, Wu, I_max, F_ODE,Nt,  u_ma
 
     gx = []
     obj = 0
-    X_traj = [X_mean[0,:]]
     Xs = cs.MX.sym('Xs', Nx)
     obj = 0
+    Xk = X_mean[0,:]
+    X_traj = [Xk]
     for i in range(Nt):
-        if (i == 0):
-            Xk = F_ODE(X_mean[0,:], U[i])
-        else:
-            Xk = F_ODE(Xk, U[i])
+        Xk += F_ODE(Xk, U[i])
         X_traj.append(Xk)
         obj += Wu*(u_max - U[i])**2 + (Xk[1])**2
         gx.append(Xk[1] - I_max)

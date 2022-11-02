@@ -47,12 +47,18 @@ namespace FROLS
         dType offset = d_offset(rng);
         dType R0_mean = (p.R0_max - p.R0_min) / 2.f + p.R0_min;
         dType R0_std = R0_mean - p.R0_min;
+        random::uniform_real_distribution<dType> d_p_I(0, 0.02);
         dType omega = d_omega(rng);
         std::vector<dType> beta(Nt);
-        std::for_each(std::execution::par_unseq, p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
+        dType p_I_w = d_p_I(rng);   
+        std::for_each(p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
                       {
-            dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
-            p_I = R0/ p.N_pop;
+            // dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
+            if ((t % 7) == 0)
+            {
+                p_I_w = d_p_I(rng);
+            }
+            p_I = p_I_w;
             t++; });
         return p_Is;
     }
@@ -75,7 +81,7 @@ namespace FROLS
     std::vector<Network_Models::SIR_Param<>> fixed_interaction_probabilities(const MC_SIR_Params<> &p, const std::vector<float> &p_Is, uint32_t Nt)
     {
         std::vector<Network_Models::SIR_Param<>> param_vec(Nt);
-        std::for_each(std::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
+        std::for_each(param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
                       {
             p_SIR.p_I = p_Is[t];
             p_SIR.p_R = 1 - std::exp(-p.alpha);
@@ -85,17 +91,17 @@ namespace FROLS
     struct MC_SIR_VectorData
     {
         MC_SIR_VectorData() {}
-        MC_SIR_VectorData(const std::vector<Network_Models::SIR_Param<>>& p_vec,const std::vector<std::vector<uint32_t>>& t)
+        MC_SIR_VectorData(const std::vector<Network_Models::SIR_Param<>> &p_vec, const std::vector<std::vector<uint32_t>> &t)
         {
             traj.resize(t[0].size(), t.size());
-            for (int i = 0;i < t.size(); i++)
+            for (int i = 0; i < t.size(); i++)
             {
                 for (int j = 0; j < t[i].size(); j++)
                 {
-                    traj(j,i) = t[i][j];
+                    traj(j, i) = t[i][j];
                 }
             }
-            //put p_vec into params
+            // put p_vec into params
             p_I.resize(p_vec.size(), 1);
             for (int i = 0; i < p_vec.size(); i++)
                 p_I(i) = p_vec[i].p_I;
@@ -147,7 +153,7 @@ namespace FROLS
         random::default_rng generator(seed);
         auto p_vec = generate_interaction_probabilities(p, generator, Nt);
         auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
-        
+
         return MC_SIR_VectorData(p_vec, traj);
     }
 
@@ -204,14 +210,13 @@ namespace FROLS
         return data_vec;
     }
 
-
     Regression::Regression_Data
-    MC_SIR_simulations_to_regression(Network_Models::SIR_VectorGraph &G_structure, const MC_SIR_Params<> &p, const std::vector<Network_Models::SIR_Param<>>& p_vec, const std::vector<uint32_t> &seeds, uint32_t Nt)
+    MC_SIR_simulations_to_regression(Network_Models::SIR_VectorGraph &G_structure, const MC_SIR_Params<> &p, const std::vector<Network_Models::SIR_Param<>> &p_vec, const std::vector<uint32_t> &seeds, uint32_t Nt)
     {
         uint32_t N_sims = seeds.size();
         std::vector<MC_SIR_VectorData> data_vec(N_sims);
         std::transform(seeds.begin(), seeds.end(), data_vec.begin(), [&](const auto &seed) mutable
-                      {
+                       {
             Network_Models::SIR_VectorGraph G_copy = G_structure;
             Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_copy, p.p_I0, p.p_R0, random::default_rng(seed));
             
@@ -220,21 +225,20 @@ namespace FROLS
             ; });
 
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
-                                          { return a + b.traj.rows()-1; });
+                                          { return a + b.traj.rows() - 1; });
 
         Regression::Regression_Data rd;
         rd.X.resize(N_rows, 3);
         rd.U.resize(N_rows, 1);
         rd.Y.resize(N_rows, 3);
-        //assign 
+        // assign
         std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
                       {
             uint32_t N_rows = data.traj.rows()-1;
             rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
             rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
             rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
-            n+= N_rows;
-        });
+            n+= N_rows; });
         return rd;
     }
 
@@ -252,21 +256,20 @@ namespace FROLS
             n++; });
 
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
-                                          { return a + b.traj.rows()-1; });
+                                          { return a + b.traj.rows() - 1; });
 
         Regression::Regression_Data rd;
         rd.X.resize(N_rows, 3);
         rd.U.resize(N_rows, 1);
         rd.Y.resize(N_rows, 3);
-        //assign 
+        // assign
         std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
                       {
             uint32_t N_rows = data.traj.rows()-1;
             rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
             rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
             rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
-            n+= N_rows;
-        });
+            n+= N_rows; });
         return rd;
     }
 
@@ -283,26 +286,23 @@ namespace FROLS
             n++; });
 
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
-                                          { return a + b.traj.rows()-1; });
+                                          { return a + b.traj.rows() - 1; });
 
         Regression::Regression_Data rd;
         rd.X.resize(N_rows, 3);
         rd.U.resize(N_rows, 1);
         rd.Y.resize(N_rows, 3);
-        //assign 
+        // assign
         std::for_each(data_vec.begin(), data_vec.end(), [&, n = 0](auto &data) mutable
                       {
             uint32_t N_rows = data.traj.rows()-1;
             rd.X(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.topRows(N_rows);
             rd.U(Eigen::seqN(n, N_rows), Eigen::all) = data.p_I;
             rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
-            n+= N_rows;
-        });
-        
-        
+            n+= N_rows; });
+
         return rd;
     }
-
 
     template <typename dType = float>
     void traj_to_file(const FROLS::MC_SIR_Params<> &p, const FROLS::MC_SIR_VectorData &d, uint32_t iter, uint32_t Nt)
@@ -310,7 +310,7 @@ namespace FROLS
         // print iter
         FROLS::DataFrame df;
         std::vector<dType> p_Is(Nt);
-        //put d.p_I into p_Is
+        // put d.p_I into p_Is
         std::transform(d.p_I.begin(), d.p_I.end(), p_Is.begin(), [](const auto &p_I)
                        { return p_I; });
         std::vector<dType> p_Rs(Nt + 1);
@@ -371,10 +371,6 @@ namespace FROLS
         p.p_R = 0.f;
         p.N_sim = N_sims;
 
-        auto MC_params = generate_interaction_probabilities(p, rng, Nt);
-        std::vector<float> p_Is(Nt);
-        std::transform(MC_params.begin(), MC_params.end(), p_Is.begin(), [](auto &p)
-                       { return p.p_I; });
         std::transform(seeds.begin(), seeds.end(), simdatas.begin(), [&, iter = 0](auto &seed) mutable
                        {
             // if ((iter % (p.N_sim / 10)) == 0)
@@ -382,6 +378,10 @@ namespace FROLS
             //     std::cout << "Simulation " << iter << " of " << p.N_sim << std::endl;
             // }
             iter++;
+            std::vector<float> p_Is(Nt);
+            auto MC_params = generate_interaction_probabilities(p, rng, Nt);
+            std::transform(MC_params.begin(), MC_params.end(), p_Is.begin(), [](auto &p)
+                       { return p.p_I; });
             return MC_SIR_simulation(G, p, seed, p_Is); });
         return simdatas;
     }
