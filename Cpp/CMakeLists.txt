@@ -37,7 +37,7 @@ find_package(pybind11 CONFIG)
 find_package(Python3 3.9 REQUIRED)
 set(FROLS_USE_INTEL ON)
 set(FROLS_USE_AMD OFF)
-set(FROLS_USE_INTEL_SYCL OFF)
+set(FROLS_USE_INTEL_SYCL ON)
 set(FROLS_USE_HIPSYCL OFF)
 
 if(${FROLS_USE_INTEL_SYCL})
@@ -94,7 +94,7 @@ endif()
 
 # option(cppitertools_INSTALL_CMAKE_DIR "share/cppitertools/cmake")
 # find_package(cppitertools QUIET)
-find_package(GTest REQUIRED)
+# find_package(GTest REQUIRED)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++")
