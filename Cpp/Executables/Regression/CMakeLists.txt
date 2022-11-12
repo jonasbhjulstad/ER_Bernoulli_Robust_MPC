@@ -1,7 +1,7 @@
 
 function(add_regression source_file)
 add_executable(${source_file} "${source_file}.cpp")
-target_include_directories(${source_file} PUBLIC ${PYTHON_INCLUDE_DIRS})
+target_include_directories(${source_file} PUBLIC ${PYTHON_INCLUDE_DIRS} ${SPIRV_HEADER_INCLUDE_DIR})
 
 target_link_libraries(${source_file} PUBLIC Common Eigen3::Eigen ${ONEAPI_LIBS} Regressors FROLS_Math Features DataFrame FROLS_Eigen FROLS_Network ${PYTHON_LIBRARIES})
 endfunction()

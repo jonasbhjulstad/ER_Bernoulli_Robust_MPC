@@ -188,6 +188,7 @@ namespace FROLS
             return G;
         }
         std::cout << "Warning: Unable to generate initial infections." << std::endl;
+        return G;
     }
 
     MC_SIR_VectorData

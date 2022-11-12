@@ -220,7 +220,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    std::vector<float> N_pop_vec = {200};
+    std::vector<float> N_pop_vec = {200, 50, 20};
     std::vector<float> p_ER_vec = {0.1, 0.5,1.0};
     std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
