@@ -3,7 +3,7 @@
     "configurations": [
         {
             "name": "(lldb) Launch",
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
             // Resolved by CMake Tools:
             "program": "${command:cmake.launchTargetPath}",
@@ -23,7 +23,7 @@
                 }
             ],
             "externalConsole": true,
-            "MIMode": "lldb",
+            "MIMode": "gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for lldb",
@@ -31,7 +31,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "miDebuggerPath": "/usr/bin/lldb"
+            "miDebuggerPath": "/usr/bin/gdb"
             
         }
     ]
