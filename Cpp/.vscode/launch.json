@@ -2,8 +2,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+<<<<<<< HEAD
             "name": "(lldb) Launch",
             "type": "lldb",
+=======
+            "name": "(gdb) Launch",
+            "type": "cppdbg",
+>>>>>>> master
             "request": "launch",
             // Resolved by CMake Tools:
             "program": "${command:cmake.launchTargetPath}",
@@ -28,11 +33,18 @@
                 {
                     "description": "Enable pretty-printing for lldb",
                     "text": "-enable-pretty-printing",
+<<<<<<< HEAD
                     "ignoreFailures": true
                 }
             ],
             "miDebuggerPath": "/usr/bin/lldb"
             
+=======
+                    "ignoreFailures": true,
+                    "debuggerPath": "/opt/intel/oneapi/debugger/latest/gdb/intel64/bin/gdb-oneapi"
+                }
+            ]
+>>>>>>> master
         }
     ]
 }

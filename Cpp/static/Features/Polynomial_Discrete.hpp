@@ -12,11 +12,22 @@ namespace FROLS::Features {
         const uint32_t Nx;
         const uint32_t Nu;
 
-        Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t N_output_features, uint32_t d_max)
-                : d_max(d_max), Nx(Nx), Nu(Nu), Feature_Model(N_output_features) {}
+        Polynomial_Model(uint32_t Nx, uint32_t Nu, uint32_t d_max, uint32_t N_output_features = 20)
+                : d_max(d_max), Nx(Nx), Nu(Nu) ,Feature_Model(N_output_features)
+                {
+                    if (this->N_output_features > get_N_features_max()) {
+                        this->N_output_features = get_N_features_max();
+                    }
 
+<<<<<<< HEAD
         // float transform(crVec &x_raw, uint32_t target_index) ;
         Vec _transform(const Mat &X_raw, uint32_t target_index, bool& index_failure);
+=======
+                }
+
+        // float transform(Vec &x_raw, uint32_t target_index) ;
+        Vec _transform(const Mat &X_raw, uint32_t target_index);
+>>>>>>> master
 
 
 
@@ -33,6 +44,7 @@ namespace FROLS::Features {
         const std::string model_equations(const std::vector<std::vector<Feature>>& features);
 
         uint32_t get_feature_index(const std::string&);
+        uint32_t get_N_features_max() const;
 
     private:
         bool index_warning_used = false;

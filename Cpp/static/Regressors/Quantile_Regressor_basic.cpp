@@ -12,7 +12,11 @@ namespace FROLS::Regression {
                 
             }
 
+<<<<<<< HEAD
     void Quantile_Regressor::theta_solve(const Mat &A, crVec &g, const Mat& Q, crVec& y, std::vector<Feature> &features) const {
+=======
+    void Quantile_Regressor::theta_solve(Mat &A, Vec &g, Mat& Q, Vec& y, std::vector<Feature> &features) const {
+>>>>>>> master
         std::vector<Feature> feature_tmp;
         feature_tmp.reserve(features.size());
         Mat y_diffs(Q.rows(), features.size()+1);
@@ -56,7 +60,11 @@ namespace FROLS::Regression {
     }
 
     std::vector<Feature>
+<<<<<<< HEAD
     Quantile_Regressor::candidate_regression(const Mat &X, const Mat& Q_global, crVec &y, const std::vector<Feature> &used_features) const {
+=======
+    Quantile_Regressor::candidate_regression(Mat &X, Mat& Q_global, Vec &y, const std::vector<Feature> &used_features) const {
+>>>>>>> master
         //get used indices of used_features
         std::vector<int> used_indices;
         used_indices.reserve(used_features.size());
@@ -77,7 +85,11 @@ namespace FROLS::Regression {
     }
 
     bool Quantile_Regressor::tolerance_check(
+<<<<<<< HEAD
             const Mat &X, crVec &y, const std::vector<Feature> &best_features) const {
+=======
+            Mat &X, Vec &y, const std::vector<Feature> &best_features) const {
+>>>>>>> master
         Vec y_pred = predict(X, best_features);
         Vec diff = y - y_pred;
         uint32_t N_samples = y.rows();

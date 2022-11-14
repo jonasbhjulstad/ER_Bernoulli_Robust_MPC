@@ -10,16 +10,26 @@ namespace FROLS::Features {
 
         Feature_Model(const uint32_t N_output_features);
 
-        Vec step(crVec &x, crVec &u, const std::vector<std::vector<Feature>>& features);
+        Vec step(const Vec &x, const Vec &u, const std::vector<std::vector<Feature>>& features);
 
+<<<<<<< HEAD
         Mat simulate(crVec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate = true);
 
         Vec transform(const Mat &X_raw, uint32_t target_index, bool &index_failure);
+=======
+        Mat simulate(const Vec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features);
+
+        Vec transform(const Mat &X_raw, uint32_t target_index);
+>>>>>>> master
 
         Mat transform(const Mat &X_raw);
 
 
+<<<<<<< HEAD
         virtual Vec _transform(const Mat &X_raw, uint32_t target_index, bool &index_failure) = 0;
+=======
+        virtual Vec _transform(const Mat &X_raw, uint32_t target_index) = 0;
+>>>>>>> master
 
 
         virtual void write_csv(const std::string &, const std::vector<std::vector<Feature>>& features) = 0;
@@ -38,24 +48,11 @@ namespace FROLS::Features {
         void write_latex(const std::vector<std::vector<Feature>>& features, const std::string &filename, const std::vector<std::string>& x_names, const std::vector<std::string>& u_names, const std::vector<std::string>& y_names, bool with_align = false, const std::string line_prefix = "&");
 
         virtual uint32_t get_feature_index(const std::string&) = 0;
-        void ignore(const std::string&);
-        void ignore(uint32_t);
-        void preselect(const std::string&, float, Feature_Tag);
-        void preselect(uint32_t, float, Feature_Tag);
 
-        const uint32_t N_output_features;
-        std::vector<uint32_t> ignore_idx;
-        std::vector<Feature> preselected_features;
-
-        std::vector<uint32_t> get_candidate_feature_idx() { return candidate_feature_idx; }
-
-        std::vector<uint32_t> get_preselect_feature_idx() { return preselect_feature_idx; }
+        uint32_t N_output_features;
 
         virtual ~Feature_Model() = default;
 
-    protected:
-        std::vector<uint32_t> preselect_feature_idx;
-        std::vector<uint32_t> candidate_feature_idx;
     };
 } // namespace FROLS::Features
 

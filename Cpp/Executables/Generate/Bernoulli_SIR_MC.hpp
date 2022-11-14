@@ -49,7 +49,7 @@ namespace FROLS
         dType R0_std = R0_mean - p.R0_min;
         dType omega = d_omega(rng);
         std::array<dType, Nt> beta;
-        std::for_each(std::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
+        std::for_each(FROLS::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
                       {
             dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
 //            p_SIR.p_I = 1 - exp(-R0*p.alpha/p.N_pop);
@@ -63,7 +63,7 @@ namespace FROLS
     std::array<Network_Models::SIR_Param<>, Nt> fixed_interaction_probabilities(const MC_SIR_Params<> &p, const std::array<float, Nt> &p_Is)
     {
         std::array<Network_Models::SIR_Param<>, Nt> param_vec;
-        std::for_each(std::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
+        std::for_each(FROLS::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
                       {
 //            p_SIR.p_I = 1 - exp(-R0*p.alpha/p.N_pop);
             p_SIR.p_I = p_Is[t];

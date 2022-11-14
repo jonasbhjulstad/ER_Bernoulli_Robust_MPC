@@ -100,16 +100,23 @@ def fake_plot(ax, t, X_stack, U_stack, X_mean, er_X_list, U_mean, er_X, er_U):
     ax[-1].set_ylabel('Contact Probability')
 
 def mpc_single_plot(ax, data, t, label=None):
-    Nx = data['X'].shape[1]
+    Nx = data['X'][0].shape[1]
     Nt = t.shape[0]
-    N_sims = int(data['X'].shape[0]/Nt)
+    N_sims = int(data['X'][0].shape[0]/Nt)
 
     X_sim = np.stack(data['X'])
+<<<<<<< HEAD
     X_list = [X_sim[:,j].reshape((N_sims, -1)) for j in range(3)]
     _ = [percentile_plot(ax[j], t, X_list[j], color='gray', hatch='', alpha_mul=0.2, label='MC-simulations') for j in range(Nx)]
     single_percentile_plot(ax[0], t, X_list[0],5, color='black',linestyle='dotted', alpha=1, label='95-percentile')
     single_percentile_plot(ax[1], t, X_list[1], 95, color='black',linestyle='dotted', alpha=1, label='95-percentile')
     single_percentile_plot(ax[2], t, X_list[2], 95, color='black',linestyle='dotted', alpha=1, label='95-percentile')
+=======
+    _ = [percentile_plot(ax[j], t, X_sim[:,:,j], color='gray', hatch='', alpha_mul=0.2, label='MC-simulations') for j in range(Nx)]
+    single_percentile_plot(ax[0], t, X_sim[:,:,0], 5, color='black',linestyle='dotted', alpha=1, label='95-percentile')
+    single_percentile_plot(ax[1], t, X_sim[:,:,1], 95, color='black',linestyle='dotted', alpha=1, label='95-percentile')
+    single_percentile_plot(ax[2], t, X_sim[:,:,2], 95, color='black',linestyle='dotted', alpha=1, label='95-percentile')
+>>>>>>> master
     _ = [ax[j].plot(t, data['x_pred'][:-1,j], color='black', linestyle='--', label='Prediction') for j in range(Nx)]
 def mpc_plot(er_ax, qr_ax, u_ax, data_er, data_qr, t):
     
@@ -119,9 +126,9 @@ def mpc_plot(er_ax, qr_ax, u_ax, data_er, data_qr, t):
     u_ax.plot(t, data_qr['u_sol'], color='black', linestyle='dashdot', label='Quantile Regression')
 
 def mpc_trajectory_plot(Gp, er_d, qr_d, t, filename):
-    Nx = er_d['X'].shape[1]
+    Nx = er_d['X'][0].shape[1]
     Nt = t.shape[0]
-    N_sims = er_d['X'].shape[0]/Nt
+    N_sims = er_d['X'][0].shape[0]/Nt
 
     fig = plt.figure()
     gs0 = gridspec.GridSpec(2, 2, figure=fig)
@@ -162,9 +169,15 @@ def mpc_trajectory_plot(Gp, er_d, qr_d, t, filename):
     fig.clear()
 
 def plot_uncontrolled(G_param_pairs, uc_datas, t, filename):
+<<<<<<< HEAD
     Nx = uc_datas[0].X.shape[1]
     Nt = t.shape[0]
     N_sims = int(uc_datas[0].X.shape[0]/Nt)
+=======
+    Nx = uc_datas[0].X[0].shape[1]
+    Nt = t.shape[0]
+    N_sims = int(uc_datas[0].X[0].shape[0]/Nt)
+>>>>>>> master
 
     fig = plt.figure()
     gs0 = gridspec.GridSpec(2, 2, figure=fig)

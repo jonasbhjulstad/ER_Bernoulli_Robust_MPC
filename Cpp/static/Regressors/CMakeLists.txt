@@ -1,7 +1,7 @@
 add_library(Regressors STATIC Regressor.hpp Regressor.cpp ERR_Regressor.cpp Quantile_Regressor.cpp ERR_Regressor.hpp Quantile_Regressor.hpp Regression_Algorithm.cpp)
 target_link_libraries(Regressors PUBLIC Common Features FROLS_Math Eigen3::Eigen ${ONEAPI_LIBS} FROLS_Sycl Coin::Clp)
 if(ortools_FOUND)
-target_link_libraries(Regressors PUBLIC ortools::ortools)
+target_link_libraries(Regressors PUBLIC ortools::ortools ${ONEAPI_LIBS})
 endif()
 # target_include_directories(Regressors PRIVATE $<TARGET_PROPERTY:Math, INTERFACE_INCLUDE_DIRECTORIES>)
 target_link_libraries(Regressors PUBLIC fmt ${ONEAPI_LIBS})

@@ -28,12 +28,20 @@ N_output_max = 80
 Nx = 3
 Nu = 1
 Nt = 56
+<<<<<<< HEAD
 er_model = pf.Polynomial_Model(Nx,Nu,N_output_max, d_max)
+=======
+er_model = pf.Polynomial_Model(Nx,Nu,d_max, N_output_max)
+>>>>>>> master
 # er_features = er_model.read_csv(DATA_DIR + 'ERR_Simulation_SIR_' + str(N_pop) + '_' + str(p_ER) + '/param.csv')
 
 
 # %%
+<<<<<<< HEAD
 qr_model = pf.Polynomial_Model(Nx,Nu,N_output_max, d_max)
+=======
+qr_model = pf.Polynomial_Model(Nx,Nu,d_max, N_output_max)
+>>>>>>> master
 # qr_features = qr_model.read_csv(DATA_DIR + 'Quantile_Simulation_SIR_' + str(N_pop) + '_' + str(p_ER) + '/param.csv')
 
 # %%
@@ -68,7 +76,11 @@ qr_param = pf.Quantile_Param()
 qr_param.tol = 1e-12
 qr_param.N_terms_max = 2
 qr_param.theta_tol = 1e-16
+<<<<<<< HEAD
 tau = .95
+=======
+tau = .7
+>>>>>>> master
 qr_param.tau = tau
 qr_regressor = pf.Quantile_Regressor(qr_param)
 
@@ -89,7 +101,7 @@ def uncontrolled_trajectory_generation(N_pop, p_ER):
     seeds = [random.randint(0, 1000000) for i in range(N_sims)]
 
     G_structure = pf.generate_SIR_ER_graph(N_pop, p_ER, seed)
-    G = pf.generate_Bernoulli_SIR_Network(G_structure, p_I0, seed, 0)
+    G = pf.generate_Bernoulli_SIR_Network(G_structure, p_I0, seed, 0, 20)
     G_mpc = G
     #generate integer seeds
     seeds = [random.randint(0, 1000000) for i in range(N_sims)]
@@ -147,9 +159,13 @@ def openloop_solve_from_csv(uc_data, rd, param_filename, model, N_sims, Nt, Wu, 
 
 
     features = model.read_csv(param_filename)
+<<<<<<< HEAD
     if (features[0] == []):
         print("Error: No features found for {} {}".format(N_pop, p_ER))
         return None
+=======
+
+>>>>>>> master
     model.write_latex(features, DATA_DIR + '/latex/param/' + file_prefix + 'param_{}_{}.tex'.format(N_pop, p_ER), x_names, u_names, y_names, False, "&")
 
     x = cs.MX.sym('x', 3)
@@ -159,7 +175,11 @@ def openloop_solve_from_csv(uc_data, rd, param_filename, model, N_sims, Nt, Wu, 
     #Quantile Regression and optimiation
     F_ODE = cs.Function("F_ODE", [x, u], [xdot])
     log_filename = DATA_DIR + '/latex/log/' + file_prefix + 'week_objective_solve_{}_{}.txt'.format(N_pop, p_ER)    
+<<<<<<< HEAD
     sol, u_sol, x_pred, stats = week_objective_solve(rd.X, rd.U, Wu, F_ODE, Nt, N_pop, log_file=log_filename)
+=======
+    sol, u_sol, x_pred, stats = week_objective_solve(rd.X[0], rd.U[0], Wu, F_ODE, Nt, N_pop, log_file=log_filename)
+>>>>>>> master
     #MPC simulations
 
     mpc_sir_p = [pf.SIR_Param() for i in range(Nt)]
@@ -183,7 +203,11 @@ seed = random.randint(0, 1000000)
 Wu = 1
 uc_datas = []
 G_param_pairs = []
+<<<<<<< HEAD
 N_pops = [50, 100]
+=======
+N_pops = [20, 50, 100]
+>>>>>>> master
 p_ERs = [0.1, 0.5, 1.0]
 t = np.array(range(Nt))
 uncontrolled_traj_fname = lambda p: DATA_DIR + '/latex/Figures/MPC_Trajectory_comparison_{}_{}.pdf'.format(p[0], p[1])
@@ -195,6 +219,7 @@ uc_rds = []
 for p in G_param_pairs:
     print('Solving for N_pop = {}, p_ER = {}'.format(p[0], p[1]))
     uc_data, rd = uncontrolled_trajectory_generation(p[0], p[1])
+<<<<<<< HEAD
 
     #convert p[1] to a string
     p_str = str(p[1])
@@ -212,6 +237,23 @@ for p in G_param_pairs:
 
         uc_datas.append(uc_data)
         uc_rds.append(rd)
+=======
+
+    #convert p[1] to a string
+    p_str = str(p[1])
+    #remove the decimal point if equal to 1
+    if p_str[-1] == '0':
+        p_str = p_str[:1]
+    uc_filename = DATA_DIR + '/Bernoulli_SIR_MC_{}_{}/regression_data.csv'.format(p[0], p_str)
+    er_param_filename = DATA_DIR + '/ERR_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
+    qr_param_filename = DATA_DIR + '/Quantile_Simulation_SIR_{}_{}/param.csv'.format(p[0], p_str)
+    er_data = openloop_solve_from_csv(uc_data, rd, er_param_filename, er_model, N_sims, Nt, Wu, p[0], p[1], file_prefix='er_')
+    qr_data = openloop_solve_from_csv(uc_data, rd, qr_param_filename, qr_model, N_sims, Nt, Wu, p[0], p[1], file_prefix='qr_')
+    mpc_trajectory_plot(p, er_data, qr_data, t, uncontrolled_traj_fname(p))
+
+    uc_datas.append(uc_data)
+    uc_rds.append(rd)
+>>>>>>> master
 
 # %%
 

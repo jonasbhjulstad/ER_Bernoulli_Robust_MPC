@@ -32,7 +32,10 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
     return ss.str();
 }
 
-constexpr uint32_t Nt = 50;
+static bool qr_invoked = false;
+using namespace Eigen;
+const static IOFormat CSVFormat(StreamPrecision, DontAlignCols, ",", "\n");
+constexpr uint32_t Nt = 50; 
 constexpr uint32_t N_sims = 50;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
@@ -43,13 +46,16 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     auto MC_fname_f = std::bind(FROLS::MC_filename, N_pop, p_ER, _1, network_type);
     auto er_outfile_f = std::bind(err_simulation_filename, N_pop, p_ER, _1, network_type);
     auto qr_outfile_f = std::bind(quantile_simulation_filename, N_pop, p_ER, _1, network_type);
-
+    using namespace FROLS::Regression;
     using namespace FROLS;
     using namespace Network_Models;
     MC_SIR_Params<> p;
     p.N_pop = N_pop;
     p.p_ER = p_ER;
+    p.N_I_min = (N_pop*10/100);
     p.N_sim = N_sims;
+    p.p_I0 = 0.2;
+    p.R0_max = 1.5;
     uint32_t NV = N_pop;
     size_t nk = FROLS::n_choose_k(NV, 2);
     uint32_t NE = 1.5 * nk;
@@ -65,7 +71,10 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     auto enum_seeds = enumerate(seeds);
 
 
-    auto trajectories = MC_SIR_simulations(N_pop, p_ER, p.p_I0, seeds, Nt, N_sims);
+    auto G_structure = generate_SIR_ER_graph(N_pop, p_ER, seeds[0]);
+    // auto G = generate_Bernoulli_SIR_Network(G_structure, p.p_I0, seeds[1], 0.f);
+
+    auto trajectories = MC_SIR_simulations(G_structure, p, seeds, Nt);
 
     std::for_each(trajectories.begin(), trajectories.end(), [&, n = 0](const auto &simdata) mutable
                   { traj_to_file(p, simdata, n++, Nt); });
@@ -85,15 +94,16 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     uint32_t Nu = 1;
     uint32_t Nx = 3;
     FROLS::Regression::Regressor_Param er_param;
-    er_param.tol = 1e-4;
+    er_param.tol = 1e-6;
     er_param.theta_tol = 1e-3;
     er_param.N_terms_max = N_terms_max;
     // ERR-Regression
 
 
     std::vector<std::vector<Feature>> preselected_features(4);
-    FROLS::Features::Polynomial_Model er_model(Nx, Nu, N_output_features, d_max);
-    FROLS::Features::Polynomial_Model qr_model(Nx, Nu, N_output_features, d_max);
+    FROLS::Features::Polynomial_Model er_model(Nx, Nu, d_max);
+    FROLS::Features::Polynomial_Model qr_model(Nx, Nu, d_max);
+
 
     FROLS::Regression::ERR_Regressor er_regressor(er_param);
 
@@ -107,23 +117,33 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         return MC_fname_f(n); });
     uint32_t Nt_max = 0;
     DataFrameStack dfs(df_names);
-    fmt::print("ERR-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, er_param.tol, er_param.N_terms_max);
+    fmt::print("ERR-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, er_model.N_output_features, er_param.tol, er_param.N_terms_max);
 
+<<<<<<< HEAD
     Mat X, Y, U;
 
     X = dataframe_to_matrix(dfs, colnames_x,
                             0, -2);
     Y = dataframe_to_matrix(dfs, colnames_x, 1, -1) - X;
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
+=======
+    std::vector<Mat> X_list(N_sims);
+    std::vector<Mat> U_list(N_sims);
+    std::vector<Mat> Y_list(N_sims);
+    for (int i = 0; i < N_sims; i++)
+    {
+        X_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 0, -2);
+        U_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_u, 0, -2);
+        Y_list[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 1, -1) - X_list[i];
+    }
+>>>>>>> master
 
     using namespace FROLS::Features;
-    std::vector<std::vector<Feature>> er_features(3);
-    std::transform(Y.colwise().begin(), Y.colwise().end(), er_features.begin(), [&](const Vec y)
-                   {
-        return er_regressor.transform_fit(X, U, y, er_model);});
+    auto er_features = er_regressor.transform_fit(X_list, U_list, Y_list, er_model);
 
     er_model.feature_summary(er_features);
 
+<<<<<<< HEAD
 
     X = dataframe_to_matrix(dfs, colnames_x,
                             0, -2);
@@ -131,6 +151,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
 
+=======
+>>>>>>> master
     std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
     float MAE_tol = 1e-6;
     float tau = .95;
@@ -139,8 +161,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     qr_param.tol = MAE_tol;
     qr_param.tau = tau;
     qr_param.theta_tol = 1e-3;
-    qr_param.N_rows = X.rows();
-    qr_param.N_threads = 8;
+    qr_param.N_rows = X_list[0].rows();
     //Regressor for S
     qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
     //Regressor for I
@@ -150,13 +171,20 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     qr_param.tau = tau;
     qr_regressors.push_back(FROLS::Regression::Quantile_Regressor(qr_param));
     // Quantile-Regression
-    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, N_output_features, qr_param.tol, qr_param.N_terms_max);
-
+    fmt::print("Quantile-Regression: d_max = {}, N_output_features = {}, tolerance = {}, max terms = {}\n", d_max, qr_model.N_output_features, qr_param.tol, qr_param.N_terms_max);
+    std::vector<std::vector<Vec>> Y_sep(3);
     std::vector<std::vector<Feature>> qr_features(3);
-    for (int i = 0; i < Y.cols(); i++)
+    qr_invoked = true;
+    for (int i = 0; i < Y_sep.size();i++)
     {
-        qr_features[i] = qr_regressors[i].transform_fit(X, U, Y.col(i), qr_model);
+        Y_sep[i].reserve(N_sims);
+        for (int j = 0; j < N_sims; j++)
+        {
+            Y_sep[i].push_back(Y_list[j].col(i));
+        }
+        qr_features[i] = qr_regressors[i].transform_fit(X_list, U_list, Y_sep[i], qr_model);
     }
+    // auto qr_features = qr_regressor.transform_fit(X_list, U_list, Y_list, qr_model);
     qr_model.feature_summary(qr_features);
     for (int i = 0; i < N_sims; i++)
     {
@@ -184,6 +212,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
         }
     }
 
+
+
     std::vector<std::string> latex_colnames_x = {"S_t", "I_t", "R_t"};
     std::vector<std::string> latex_colnames_u = {"p_I"};
     std::vector<std::string> latex_colnames_y = {"S_{t+1}", "I_{t+1}", "R_{t+1}"};
@@ -209,9 +239,15 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
+<<<<<<< HEAD
     auto N_pop_vec = {100};
     std::vector<float> p_ER_vec = {1.0};
     // std::reverse(N_pop_vec.begin(), N_pop_vec.end());
+=======
+    std::vector<float> N_pop_vec = {200, 50, 20};
+    std::vector<float> p_ER_vec = {0.1, 0.5,1.0};
+    std::reverse(N_pop_vec.begin(), N_pop_vec.end());
+>>>>>>> master
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)
     {

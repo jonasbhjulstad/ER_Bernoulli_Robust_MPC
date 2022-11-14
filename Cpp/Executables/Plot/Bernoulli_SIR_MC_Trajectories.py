@@ -21,7 +21,11 @@ if __name__ == '__main__':
     csv_model = DATA_DIR + '/model.csv'
 
 
+<<<<<<< HEAD
     N_pop = 100
+=======
+    N_pop = 200
+>>>>>>> master
 
     # find all csv in data_path
     files = glob.glob(DATA_DIR + "Bernoulli_SIR_MC_" + str(N_pop) + "_1/*.csv")
@@ -32,7 +36,11 @@ if __name__ == '__main__':
     
 
     I = np.zeros_like(dfs[0]["S"].to_numpy())
+<<<<<<< HEAD
     for df in dfs[:50]:
+=======
+    for df in dfs[:100]:
+>>>>>>> master
         X = df[["S", "I", "R"]].to_numpy()
         ax[0].plot(df["t"], df["S"], color='gray', alpha=.2)
         ax[1].plot(df["t"], df["I"], color='gray', alpha=.2)

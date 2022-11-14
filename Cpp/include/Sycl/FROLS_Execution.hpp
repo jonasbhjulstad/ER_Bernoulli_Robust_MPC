@@ -4,7 +4,8 @@
 #ifndef FROLS_FROLS_EXECUTION_HPP
 #define FROLS_FROLS_EXECUTION_HPP
 
-#ifdef FROLS_USE_INTEL_SYCL
+#ifdef FROLS_USE_ONEDPL
+#include <sycl/sycl.hpp>
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/algorithm>
 #else
@@ -17,11 +18,17 @@ namespace FROLS::execution {
     using namespace oneapi::dpl;
     using namespace oneapi::dpl::execution;
     static auto default_policy = dpcpp_default;
+    
 #else
+    #ifdef FROLS_NO_PARALLEL
+    static auto par_unseq = std::execution::seq;
+    static auto par = std::execution::seq;
+    #else
     static auto par_unseq = std::execution::par_unseq;
     static auto par = std::execution::par;
+    #endif
     static auto seq = std::execution::seq;
-    static auto default_policy = std::execution::par_unseq;
+    static auto default_policy = FROLS::execution::par_unseq;
 #endif
 }
 

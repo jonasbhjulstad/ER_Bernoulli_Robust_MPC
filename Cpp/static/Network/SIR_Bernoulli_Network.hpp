@@ -58,7 +58,7 @@ namespace Network_Models
 
             FROLS::random::uniform_real_distribution<dType> d_I;
             FROLS::random::uniform_real_distribution<dType> d_R;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto v)
+            std::for_each(FROLS::execution::par_unseq, G.begin(), G.end(), [&](auto v)
                           {
                 if (d_I(rng) < p_I0) {
                     G.assign(v.id, SIR_I);
@@ -85,7 +85,7 @@ namespace Network_Models
 
             // print distance between G.begin() and G.end/()
             //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(),  [&](auto v0)
+            std::for_each(FROLS::execution::par_unseq, G.begin(), G.end(),  [&](auto v0)
                           {
                 //print id of thread
                 if (v0.data == SIR_I) {
@@ -103,7 +103,7 @@ namespace Network_Models
         {
 
             FROLS::random::uniform_real_distribution<dType> d_R;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
+            std::for_each(FROLS::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
                           {
                 bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;
                 G.assign(v.id, (recover_trigger) ? SIR_R : v.data); });
@@ -111,7 +111,7 @@ namespace Network_Models
 
         bool terminate(const SIR_Param<> &p, const std::array<uint32_t, 3> &x)
         {
-            bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
+            bool early_termination = ((t > p.Nt_min) || x[1] < p.N_I_min);
             return early_termination;
         }
 
@@ -158,7 +158,7 @@ namespace Network_Models
 
             FROLS::random::uniform_real_distribution<dType> d_I;
             FROLS::random::uniform_real_distribution<dType> d_R;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](auto v)
+            std::for_each(FROLS::execution::par_unseq, G.begin(), G.end(), [&](auto v)
                           {
                 if (d_I(rng) < p_I0) {
                     G.assign(v.id, SIR_I);
@@ -185,7 +185,7 @@ namespace Network_Models
 
             // print distance between G.begin() and G.end/()
             //  std::cout << std::distance(G.begin(), G.end()) << std::endl;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(),  [&](auto v0)
+            std::for_each(FROLS::execution::par_unseq, G.begin(), G.end(),  [&](auto v0)
                           {
                 //print id of thread
                 if (v0.data == SIR_I) {
@@ -203,7 +203,7 @@ namespace Network_Models
         {
 
             FROLS::random::uniform_real_distribution<dType> d_R;
-            std::for_each(std::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
+            std::for_each(FROLS::execution::par_unseq, G.begin(), G.end(), [&](const auto &v)
                           {
                 bool recover_trigger = (v.data == SIR_I) && d_R(rng) < p_R;
                 G.assign(v.id, (recover_trigger) ? SIR_R : v.data); });
@@ -211,7 +211,7 @@ namespace Network_Models
 
         bool terminate(const SIR_Param<> &p, const std::vector<uint32_t> &x)
         {
-            bool early_termination = ((t > p.Nt_min) && x[1] < p.N_I_min);
+            bool early_termination = ((t > p.Nt_min) || (x[1] < p.N_I_min));
             return early_termination;
         }
 

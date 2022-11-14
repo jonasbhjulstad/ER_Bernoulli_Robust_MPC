@@ -9,6 +9,7 @@
 #include <Regressor.hpp>
 #include <SIR_Bernoulli_Network.hpp>
 #include <utility>
+#include <FROLS_Eigen.hpp>
 namespace FROLS
 {
     template <typename dType = float>
@@ -41,15 +42,22 @@ namespace FROLS
     std::vector<dType> generate_infection_probabilities(const MC_SIR_Params<> &p, RNG &rng, uint32_t Nt)
     {
         std::vector<dType> p_Is(Nt);
-        dType omega_bounds[] = {(2.f * M_PIf) / 5.f, (2.f * M_PIf) / 10.f};
+        dType omega_bounds[] = {(2.f * M_PIf) / 2000.f, (2.f * M_PIf) / 100.f};
         random::uniform_real_distribution<dType> d_omega(omega_bounds[0], omega_bounds[1]);
         random::uniform_real_distribution<dType> d_offset(0.f, 2.f * M_PIf);
+        random::uniform_real_distribution<dType> d_white(0.f, p.R0_max);
         dType offset = d_offset(rng);
         dType R0_mean = (p.R0_max - p.R0_min) / 2.f + p.R0_min;
+<<<<<<< HEAD
         dType R0_std = R0_mean - p.R0_min;
         random::uniform_real_distribution<dType> d_p_I(0, 0.02);
+=======
+        dType R0_std = (p.R0_max - p.R0_min)/2;
+>>>>>>> master
         dType omega = d_omega(rng);
+        // omega = 0;
         std::vector<dType> beta(Nt);
+<<<<<<< HEAD
         dType p_I_w = d_p_I(rng);   
         std::for_each(p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
                       {
@@ -59,6 +67,25 @@ namespace FROLS
                 p_I_w = d_p_I(rng);
             }
             p_I = p_I_w;
+=======
+        R0_mean = 1.5;
+        // std::exponential_distribution<dType> d_exp(1);
+        random::uniform_real_distribution<dType> d_R0(0, 0.01);
+        // dType p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+        // dType p_I_val = d_R0(rng)/p.N_pop;
+        dType p_I_val = d_R0(rng);
+        std::for_each(p_Is.begin(), p_Is.end(), [&, t = 0](auto &p_I) mutable
+                      {
+            dType R0 = R0_mean + R0_std * std::sin(omega * t + offset);
+            // p_I = std::max({R0 / p.N_pop, (dType) 0});//1 - std::exp(-R0/ p.N_pop);
+            p_I = p_I_val;
+            if ((t % 7) == 0)
+            {
+                // p_I_val = R0_mean*d_exp(rng)/p.N_pop;
+                // p_I_val = d_R0(rng)/p.N_pop;
+                p_I_val = d_R0(rng);
+            }
+>>>>>>> master
             t++; });
         return p_Is;
     }
@@ -67,6 +94,10 @@ namespace FROLS
     std::vector<Network_Models::SIR_Param<>> generate_interaction_probabilities(const MC_SIR_Params<> &p_gen, RNG &rng, uint32_t Nt)
     {
         std::vector<Network_Models::SIR_Param<>> param_vec(Nt);
+        std::for_each(param_vec.begin(), param_vec.end(), [&](auto &param)
+                      {
+                        param.N_I_min = p_gen.N_I_min;
+        });
         auto p_Is = generate_infection_probabilities(p_gen, rng, Nt);
         std::transform(p_Is.begin(), p_Is.end(), param_vec.begin(), [&](auto p_I)
                        {
@@ -81,7 +112,11 @@ namespace FROLS
     std::vector<Network_Models::SIR_Param<>> fixed_interaction_probabilities(const MC_SIR_Params<> &p, const std::vector<float> &p_Is, uint32_t Nt)
     {
         std::vector<Network_Models::SIR_Param<>> param_vec(Nt);
+<<<<<<< HEAD
         std::for_each(param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
+=======
+        std::for_each(FROLS::execution::par_unseq, param_vec.begin(), param_vec.end(), [&, t = 0](auto &p_SIR) mutable
+>>>>>>> master
                       {
             p_SIR.p_I = p_Is[t];
             p_SIR.p_R = 1 - std::exp(-p.alpha);
@@ -110,6 +145,30 @@ namespace FROLS
         Vec p_I;
     };
 
+    Regression::Regression_Data MC_SIR_to_regression_data(const std::vector<MC_SIR_VectorData>& data)
+    {
+        Regression::Regression_Data reg_data(data.size());
+        for (int i = 0; i < data.size(); i++)
+        {
+            reg_data.U[i] = data[i].p_I;
+            reg_data.X[i] = data[i].traj.topRows(data[i].traj.rows() - 1);
+            reg_data.Y[i] = data[i].traj.bottomRows(data[i].traj.rows() - 1);
+        }
+        return reg_data;
+    }
+
+    // void dataframe_to_regression_data(DataFrameStack& dfs, const std::vector<std::string>& colnames_x, const std::vector<std::string> colnames_u, Regression_Data& reg_data)
+    // {
+    //     uint32_t N_dfs = dfs.dataframes.size();
+    //     for (int i = 0; i < N_dfs; i++)
+    //     {
+    //         reg_data.U[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_u, 0, -2);
+    //         reg_data.X[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 0, -2);
+    //         reg_data.Y[i] = dataframe_to_matrix(dfs.dataframes[i], colnames_x, 1, -1);
+    //     }
+    //     return reg_data;
+    // }
+
     Network_Models::SIR_VectorGraph generate_SIR_ER_graph(uint32_t N_pop, float p_ER, uint32_t seed)
     {
         using namespace Network_Models;
@@ -137,13 +196,19 @@ namespace FROLS
     }
 
     Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float>
-    generate_Bernoulli_SIR_Network(Network_Models::SIR_VectorGraph &G_structure, float p_I0, uint32_t seed, float p_R0 = 0.f)
+    generate_Bernoulli_SIR_Network(Network_Models::SIR_VectorGraph &G_structure, float p_I0, uint32_t seed, float p_R0 = 0.f,  uint32_t N_initialization_attempts = 20)
     {
         random::default_rng generator(seed);
         Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_structure, p_I0, p_R0,
                                                                                    generator);
+        for (int i = 0; i < N_initialization_attempts; i++)
+        {
         G.reset();
         G.initialize();
+        if (G.population_count()[1] > 0)
+            return G;
+        }
+        std::cout << "Warning: Unable to generate initial infections." << std::endl;
         return G;
     }
 
@@ -152,6 +217,7 @@ namespace FROLS
     {
         random::default_rng generator(seed);
         auto p_vec = generate_interaction_probabilities(p, generator, Nt);
+<<<<<<< HEAD
         //set all nt_min to N_pop/10
         std::for_each(p_vec.begin(), p_vec.end(), [](auto &p)
                       {
@@ -159,6 +225,10 @@ namespace FROLS
         });
         auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
 
+=======
+        auto traj = G.simulate(p_vec, Nt, p.Nt_min);
+        
+>>>>>>> master
         return MC_SIR_VectorData(p_vec, traj);
     }
 
@@ -168,11 +238,15 @@ namespace FROLS
         uint32_t Nt = p_Is.size();
         random::default_rng generator(seed);
         auto p_vec = fixed_interaction_probabilities<decltype(generator)>(p, p_Is, Nt);
+<<<<<<< HEAD
         std::for_each(p_vec.begin(), p_vec.end(), [&](auto &pt)
                       {
             pt.N_I_min = p.N_I_min;
         });
         auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
+=======
+        auto traj = G.simulate(p_vec, Nt, p.Nt_min);
+>>>>>>> master
         return MC_SIR_VectorData(p_vec, traj);
     }
     std::vector<MC_SIR_VectorData>
@@ -229,10 +303,11 @@ namespace FROLS
             Network_Models::SIR_VectorGraph G_copy = G_structure;
             Network_Models::Vector_SIR_Bernoulli_Network<random::default_rng, float> G(G_copy, p.p_I0, p.p_R0, random::default_rng(seed));
             
-            auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
+            auto traj = G.simulate(p_vec, Nt, p.Nt_min);
             return MC_SIR_VectorData(p_vec, traj);
             ; });
 
+<<<<<<< HEAD
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
                                           { return a + b.traj.rows() - 1; });
 
@@ -249,6 +324,10 @@ namespace FROLS
             rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
             n+= N_rows; });
         return rd;
+=======
+
+        return MC_SIR_to_regression_data(data_vec);
+>>>>>>> master
     }
 
     Regression::Regression_Data
@@ -263,6 +342,7 @@ namespace FROLS
             
             data = MC_SIR_simulation(G, seeds[n], p, Nt);
             n++; });
+<<<<<<< HEAD
 
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
                                           { return a + b.traj.rows() - 1; });
@@ -280,6 +360,9 @@ namespace FROLS
             rd.Y(Eigen::seqN(n, N_rows), Eigen::all) = data.traj.bottomRows(N_rows);
             n+= N_rows; });
         return rd;
+=======
+        return MC_SIR_to_regression_data(data_vec);
+>>>>>>> master
     }
 
     Regression::Regression_Data
@@ -294,6 +377,7 @@ namespace FROLS
             data = MC_SIR_simulation(G, seeds[n], p, Nt);
             n++; });
 
+<<<<<<< HEAD
         uint32_t N_rows = std::accumulate(data_vec.begin(), data_vec.end(), 0, [](const auto &a, const auto &b)
                                           { return a + b.traj.rows() - 1; });
 
@@ -311,6 +395,13 @@ namespace FROLS
             n+= N_rows; });
 
         return rd;
+=======
+
+
+        
+        
+        return MC_SIR_to_regression_data(data_vec);
+>>>>>>> master
     }
 
     template <typename dType = float>
