@@ -75,7 +75,7 @@ PYBIND11_MODULE(pyFROLS, m)
         .def_readonly("solver_type", &Quantile_Param::solver_type);
     py::class_<Regressor>(m, "Regressor")
         .def("fit", &Regressor::fit)
-        .def("transform_fit", py::overload_cast<crMat &, crMat &, crVec &, Features::Feature_Model &>(&Regressor::transform_fit))
+        .def("transform_fit", py::overload_cast<const Mat &, const Mat &, crVec &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("transform_fit", py::overload_cast<const std::vector<std::string> &, const std::vector<std::string> &, const std::vector<std::string> &, const std::string &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("transform_fit", py::overload_cast<const Regression_Data &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("theta_solve", &Regressor::theta_solve);

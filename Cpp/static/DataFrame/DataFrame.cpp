@@ -14,7 +14,7 @@ namespace FROLS {
         assign(col_name, std::vector<float>(vec.data(), vec.data() + vec.rows()));
     }
 
-    void DataFrame::assign(const std::vector<std::string> &col_names, crMat &mat) {
+    void DataFrame::assign(const std::vector<std::string> &col_names, const Mat &mat) {
         for (int i = 0; i < mat.cols(); i++) {
             assign(col_names[i], mat.col(i));
         }

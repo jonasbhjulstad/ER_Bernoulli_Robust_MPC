@@ -3,7 +3,7 @@ include(GoogleTest)
 function(add_custom_executable source_file)
     add_executable(${source_file} "${source_file}.cpp")
     target_include_directories(${source_file} PUBLIC "../include")
-    target_link_libraries(${source_file} PUBLIC Eigen3::Eigen ${SUNDIALS_LIBS} FROLS_Graph)
+    target_link_libraries(${source_file} PUBLIC Eigen3::Eigen ${SUNDIALS_LIBS} FROLS_Graph Coin::Clp)
 endfunction()
 
 function(add_custom_test source_file)
@@ -33,7 +33,7 @@ target_include_directories(MC_SIR_test PUBLIC "../Executables/Generate/")
 # target_include_directories(neighbor_test PUBLIC "../Executables/Generate/")
 # add_custom_executable(sycl_info)
 
-
+add_custom_executable(clpex)
 # add_custom_test(Graph_Iterators)
 # target_include_directories(Graph_Iterators PUBLIC "../static/Graph/")
 # add_custom_test(SIR_integrator)

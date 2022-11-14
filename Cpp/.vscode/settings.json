@@ -111,5 +111,29 @@
         "**/data": true,
         "**/build": true
     },
+    "cmake.debugConfig": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "C++ Launch (Windows)",
+                "type": "lldb",
+                "request": "launch",
+                "program": "enter program name, for example ${workspaceRoot}/a.exe",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceRoot}",
+                "environment": [],
+                "externalConsole": false,
+                "all": {
+                    "request": "launch",
+                    "cwd": "${workspaceRoot}",
+                    "linux": {
+                        "MIMode": "lldb"
+                    }
+                },
+                "miDebuggerPath": "/usr/bin/lldb"
+            }
+        ]
+    }
 
 }

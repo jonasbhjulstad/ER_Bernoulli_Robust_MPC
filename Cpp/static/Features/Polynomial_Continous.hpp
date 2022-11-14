@@ -18,7 +18,7 @@ namespace FROLS::Features {
 
 
         // float transform(crVec &x_raw, uint32_t target_index) ;
-        Vec _transform(crMat &X_raw, uint32_t target_index, bool& index_failure);
+        Vec _transform(const Mat &X_raw, uint32_t target_index, bool& index_failure);
 
 
         const std::vector<std::vector<Feature>> get_features();

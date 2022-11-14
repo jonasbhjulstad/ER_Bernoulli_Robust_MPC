@@ -31,8 +31,8 @@ namespace Network_Models
         SIR_Param(){}
         dType p_I = 0;
         dType p_R = 0;
-        uint32_t Nt_min = std::numeric_limits<uint32_t>::max();
-        uint32_t N_I_min = 0;
+        uint32_t Nt_min = 10;
+        uint32_t N_I_min = 6;
     };
     template <uint32_t NV, uint32_t NE>
     using SIR_ArrayGraph = FROLS::Graph::ArrayGraph<SIR_State, SIR_Edge, NV, NE>;

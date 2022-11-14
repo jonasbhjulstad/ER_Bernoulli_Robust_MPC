@@ -22,10 +22,10 @@ namespace FROLS
         dType alpha = 0.1f;
         dType p_I = 0.f;
         uint32_t N_sim = 1000;
-        uint32_t Nt_min = 15;
+        uint32_t Nt_min = 10;
         dType p_R = 0.1f;
         uint32_t seed;
-        uint32_t N_I_min = N_pop / 10;
+        uint32_t N_I_min = N_pop / 2;
         uint32_t iter_offset = 0;
         dType csv_termination_tol = 1e-6f;
     };

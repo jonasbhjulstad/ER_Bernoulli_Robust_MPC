@@ -76,7 +76,7 @@ namespace FROLS::Regression {
 
     }
 
-    Feature Regressor::best_feature_select(crMat &X, crMat& Q_global, crVec &y, const std::vector<Feature> &used_features) const {
+    Feature Regressor::best_feature_select(const Mat &X, const Mat& Q_global, crVec &y, const std::vector<Feature> &used_features) const {
         const std::vector<Feature> candidates = candidate_regression(X, Q_global, y, used_features);
         std::vector<Feature> thresholded_candidates;
         std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(thresholded_candidates),
@@ -103,7 +103,7 @@ namespace FROLS::Regression {
         return res;
     }
 
-    std::vector<Feature> Regressor::fit(crMat &X, crVec &y) {
+    std::vector<Feature> Regressor::fit(const Mat &X, crVec &y) {
         if ((X.rows() != y.rows())) {
             throw std::invalid_argument("X, U and y must have same number of rows");
         }
@@ -112,7 +112,7 @@ namespace FROLS::Regression {
         return result;
     }
 
-    Vec Regressor::predict(crMat &Q, const std::vector<Feature> &features) const {
+    Vec Regressor::predict(const Mat &Q, const std::vector<Feature> &features) const {
         Vec y_pred(Q.rows());
         y_pred.setZero();
         uint32_t i = 0;
@@ -132,7 +132,7 @@ namespace FROLS::Regression {
     };
 
 
-    std::vector<Feature> Regressor::transform_fit(crMat &X_raw, crMat &U_raw, crVec &y,
+    std::vector<Feature> Regressor::transform_fit(const Mat &X_raw, const Mat &U_raw, crVec &y,
                                   Features::Feature_Model &model) {
         Mat XU(X_raw.rows(), X_raw.cols() + U_raw.cols());
         XU << X_raw, U_raw;

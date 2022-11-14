@@ -12,14 +12,14 @@ namespace FROLS::Features {
 
         Vec step(crVec &x, crVec &u, const std::vector<std::vector<Feature>>& features);
 
-        Mat simulate(crVec &x0, crMat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features);
+        Mat simulate(crVec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate = true);
 
-        Vec transform(crMat &X_raw, uint32_t target_index, bool &index_failure);
+        Vec transform(const Mat &X_raw, uint32_t target_index, bool &index_failure);
 
-        Mat transform(crMat &X_raw);
+        Mat transform(const Mat &X_raw);
 
 
-        virtual Vec _transform(crMat &X_raw, uint32_t target_index, bool &index_failure) = 0;
+        virtual Vec _transform(const Mat &X_raw, uint32_t target_index, bool &index_failure) = 0;
 
 
         virtual void write_csv(const std::string &, const std::vector<std::vector<Feature>>& features) = 0;

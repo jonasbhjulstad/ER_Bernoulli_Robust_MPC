@@ -4,7 +4,7 @@
 
 namespace FROLS::Regression {
 
-    std::vector<Feature> ERR_Regressor::candidate_regression(crMat &X, crMat& Q_global, crVec &y,
+    std::vector<Feature> ERR_Regressor::candidate_regression(const Mat &X, const Mat& Q_global, crVec &y,
                                                              const std::vector<Feature> &used_features) const {
         std::vector<uint32_t> candidate_idx = unused_feature_indices(used_features, X.cols());
         std::vector<Feature> candidates(X.cols() - used_features.size());
@@ -26,7 +26,7 @@ namespace FROLS::Regression {
     }
 
     bool ERR_Regressor::tolerance_check(
-            crMat &Q, crVec &y,
+            const Mat &Q, crVec &y,
             const std::vector<Feature> &best_features) const {
         float ERR_tot = 0;
         for (const auto &feature: best_features) {
@@ -39,7 +39,7 @@ namespace FROLS::Regression {
         return (1 - f0.f_ERR) < (1 - f1.f_ERR);
     }
 
-    void ERR_Regressor::theta_solve(crMat &A, crVec &g, crMat& X, crVec& y, std::vector<Feature> &features) const {
+    void ERR_Regressor::theta_solve(const Mat &A, crVec &g, const Mat& X, crVec& y, std::vector<Feature> &features) const {
         Vec coefficients =
                 A.inverse() * g;
         for (

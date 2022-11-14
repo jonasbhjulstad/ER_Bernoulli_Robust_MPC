@@ -8,12 +8,12 @@ namespace FROLS::Features
     Feature_Model::Feature_Model(const uint32_t N_output_features) : N_output_features(
                                                                          N_output_features) {}
 
-    Vec Feature_Model::transform(crMat &X_raw, uint32_t target_index, bool &index_failure)
+    Vec Feature_Model::transform(const Mat &X_raw, uint32_t target_index, bool &index_failure)
     {
         return _transform(X_raw, target_index, index_failure);
     }
 
-    Mat Feature_Model::transform(crMat &X_raw)
+    Mat Feature_Model::transform(const Mat &X_raw)
     {
         uint32_t N_input_features = X_raw.cols();
         uint32_t N_rows = X_raw.rows();
@@ -80,14 +80,16 @@ namespace FROLS::Features
         return x_next;
     }
 
-    Mat Feature_Model::simulate(crVec &x0, crMat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features)
+    Mat Feature_Model::simulate(crVec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate)
     {
         Mat X(Nt + 1, x0.rows());
         X.setZero();
         X.row(0) = x0;
         for (int i = 0; i < Nt; i++)
         {
-            X.row(i + 1) = step(X.row(i), U.row(i), features);
+            if (integrate)
+                X.row(i+1) += X.row(i);
+            X.row(i + 1) += step(X.row(i), U.row(i), features);
         }
         return X;
     }

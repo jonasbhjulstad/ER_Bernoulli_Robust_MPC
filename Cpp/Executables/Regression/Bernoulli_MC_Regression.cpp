@@ -1,3 +1,4 @@
+#define COIN_DEBUG
 
 #include "../Generate/Bernoulli_SIR_MC_Dynamic.hpp"
 #include <quantiles.hpp>
@@ -8,7 +9,6 @@
 #include <utility>
 #include <chrono>
 #include <fmt/format.h>
-
 #include <FROLS_Eigen.hpp>
 #include <Quantile_Regressor.hpp>
 #include <ERR_Regressor.hpp>
@@ -130,6 +130,7 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     Y = dataframe_to_matrix(dfs, colnames_x, 1, -1) - X;
     U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
+
     std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
     float MAE_tol = 1e-6;
     float tau = .95;
@@ -208,8 +209,8 @@ void simulation_loop(uint32_t N_pop, float p_ER)
 int main(int argc, char **argv)
 {
     // auto N_pop_vec = FROLS::arange((uint32_t)10, (uint32_t)100, (uint32_t)10);
-    auto N_pop_vec = {20, 50, 100};
-    std::vector<float> p_ER_vec = {0.1,.5, 1.0};
+    auto N_pop_vec = {100};
+    std::vector<float> p_ER_vec = {1.0};
     // std::reverse(N_pop_vec.begin(), N_pop_vec.end());
     std::reverse(p_ER_vec.begin(), p_ER_vec.end());
     for (const float &p_ER : p_ER_vec)

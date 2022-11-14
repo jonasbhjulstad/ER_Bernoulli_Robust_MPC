@@ -64,7 +64,7 @@ namespace FROLS {
 
         void assign(const std::string &col_name, crVec &vec);
 
-        void assign(const std::vector<std::string> &col_names, crMat &mat);
+        void assign(const std::vector<std::string> &col_names, const Mat &mat);
 
         void assign(const std::vector<std::string> &col_names,
                     const std::vector<std::vector<float>> &col_data);

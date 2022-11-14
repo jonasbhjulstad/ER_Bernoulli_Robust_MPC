@@ -23,7 +23,7 @@ namespace FROLS
         dType alpha = 0.1f;
         dType p_I = 0.f;
         uint32_t N_sim = 1000;
-        uint32_t Nt_min = 15;
+        uint32_t Nt_min = 10;
         dType p_R = 0.1f;
         uint32_t seed;
         uint32_t N_I_min = N_pop / 10;
@@ -152,6 +152,11 @@ namespace FROLS
     {
         random::default_rng generator(seed);
         auto p_vec = generate_interaction_probabilities(p, generator, Nt);
+        //set all nt_min to N_pop/10
+        std::for_each(p_vec.begin(), p_vec.end(), [](auto &p)
+                      {
+            p.N_I_min = p.N_I_min;
+        });
         auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
 
         return MC_SIR_VectorData(p_vec, traj);
@@ -163,6 +168,10 @@ namespace FROLS
         uint32_t Nt = p_Is.size();
         random::default_rng generator(seed);
         auto p_vec = fixed_interaction_probabilities<decltype(generator)>(p, p_Is, Nt);
+        std::for_each(p_vec.begin(), p_vec.end(), [&](auto &pt)
+                      {
+            pt.N_I_min = p.N_I_min;
+        });
         auto traj = G.simulate(p_vec, Nt, p.N_I_min, p.Nt_min);
         return MC_SIR_VectorData(p_vec, traj);
     }
