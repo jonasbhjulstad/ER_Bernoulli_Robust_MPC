@@ -10,9 +10,9 @@ namespace FROLS::Features {
 
         Feature_Model(const uint32_t N_output_features);
 
-        Vec step(crVec &x, crVec &u, const std::vector<std::vector<Feature>>& features);
+        Vec step(const Vec &x, const Vec &u, const std::vector<std::vector<Feature>>& features);
 
-        Mat simulate(crVec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate = true);
+        Mat simulate(const Vec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate = true);
 
         Vec transform(const Mat &X_raw, uint32_t target_index, bool &index_failure);
 

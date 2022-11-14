@@ -10,6 +10,8 @@ import sys
 # BINDER_DIR = "/home/arch/Documents/Bernoulli_Network_Optimal_Control/Cpp/build/Binders/"
 # sys.path.insert(0, BINDER_DIR)
 # from pyFROLS import *
+# make matplotlib use tk
+plt.switch_backend('Qt5Agg')
 
 if __name__ == '__main__':  
     arglist = str(sys.argv)

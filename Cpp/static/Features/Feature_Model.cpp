@@ -56,7 +56,7 @@ namespace FROLS::Features
         return X_poly;
     }
 
-    Vec Feature_Model::step(crVec &x, crVec &u, const std::vector<std::vector<Feature>>& features)
+    Vec Feature_Model::step(const Vec &x, const Vec &u, const std::vector<std::vector<Feature>>& features)
     {
         Vec x_next(x.rows());
         Mat X(1, x.rows() + u.rows());
@@ -80,7 +80,7 @@ namespace FROLS::Features
         return x_next;
     }
 
-    Mat Feature_Model::simulate(crVec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate)
+    Mat Feature_Model::simulate(const Vec &x0, const Mat &U, uint32_t Nt, const std::vector<std::vector<Feature>>& features, bool integrate)
     {
         Mat X(Nt + 1, x0.rows());
         X.setZero();

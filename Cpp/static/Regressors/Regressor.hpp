@@ -28,17 +28,17 @@ namespace FROLS::Regression
 
         Regressor(const Regressor_Param &);
 
-        std::vector<Feature> fit(const Mat &X, crVec &y);
+        std::vector<Feature> fit(const Mat &X, const Vec &y);
         // declare transform_fit functions with vector ys
         
         std::vector<std::vector<Feature>> transform_fit(const Regression_Data& rd,
                                   Features::Feature_Model &model);
         
-        std::vector<Feature> transform_fit(const Mat &X_raw, const Mat &U_raw, crVec &y,
+        std::vector<Feature> transform_fit(const Mat &X_raw, const Mat &U_raw, const Vec &y,
                                            Features::Feature_Model &model);
         std::vector<Feature> transform_fit(const std::vector<std::string> &filenames, const std::vector<std::string> &colnames_x, const std::vector<std::string> &colnames_u, const std::string &colname_y, Features::Feature_Model &model);
 
-        virtual void theta_solve(const Mat &A, crVec &g, const Mat &X, crVec &y, std::vector<Feature> &features) const = 0;
+        virtual void theta_solve(const Mat &A, const Vec &g, const Mat &X, const Vec &y, std::vector<Feature> &features) const = 0;
         virtual ~Regressor() = default;
 
     protected:
@@ -51,16 +51,16 @@ namespace FROLS::Regression
 
         std::vector<Feature> single_fit(const Mat &X, const Vec &y, std::vector<Feature> preselect_features) const;
 
-        virtual std::vector<Feature> candidate_regression(const Mat &X, const Mat &Q_global, crVec &y,
+        virtual std::vector<Feature> candidate_regression(const Mat &X, const Mat &Q_global, const Vec &y,
                                                           const std::vector<Feature> &used_features) const = 0;
 
         virtual bool
-        tolerance_check(const Mat &Q, crVec &y,
+        tolerance_check(const Mat &Q, const Vec &y,
                         const std::vector<Feature> &best_features) const = 0;
 
         virtual Feature feature_selection_criteria(const std::vector<Feature> &candidate_features) const = 0;
 
-        Feature best_feature_select(const Mat &X, const Mat &Q_global, crVec &y, const std::vector<Feature> &used_features) const;
+        Feature best_feature_select(const Mat &X, const Mat &Q_global, const Vec &y, const std::vector<Feature> &used_features) const;
 
         static int regressor_count;
     };

@@ -71,11 +71,10 @@ PYBIND11_MODULE(pyFROLS, m)
         .def(py::init<>())
         .def_readwrite("tau", &Quantile_Param::tau)
         .def_readwrite("N_rows", &Quantile_Param::N_rows)
-        .def_readwrite("N_threads", &Quantile_Param::N_threads)
-        .def_readonly("solver_type", &Quantile_Param::solver_type);
+        .def_readwrite("N_threads", &Quantile_Param::N_threads);
     py::class_<Regressor>(m, "Regressor")
         .def("fit", &Regressor::fit)
-        .def("transform_fit", py::overload_cast<const Mat &, const Mat &, crVec &, Features::Feature_Model &>(&Regressor::transform_fit))
+        .def("transform_fit", py::overload_cast<const Mat &, const Mat &, const Vec &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("transform_fit", py::overload_cast<const std::vector<std::string> &, const std::vector<std::string> &, const std::vector<std::string> &, const std::string &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("transform_fit", py::overload_cast<const Regression_Data &, Features::Feature_Model &>(&Regressor::transform_fit))
         .def("theta_solve", &Regressor::theta_solve);

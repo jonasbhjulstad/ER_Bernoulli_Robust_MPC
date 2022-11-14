@@ -8,8 +8,8 @@ Quantile_Regressor::Quantile_Regressor(const Quantile_Param &p)
     : tau(p.tau), Regressor(p), solver_type(p.solver_type),
       problem_type(p.problem_type) {}
 
-void Quantile_Regressor::theta_solve(const Mat &A, crVec &g, const Mat &Q,
-                                     crVec &y,
+void Quantile_Regressor::theta_solve(const Mat &A, const Vec &g, const Mat &Q,
+                                     const Vec &y,
                                      std::vector<Feature> &features) const {
   std::vector<Feature> feature_tmp;
   feature_tmp.reserve(features.size());
@@ -102,7 +102,7 @@ Feature Quantile_Regressor::single_feature_regression(const Vec &x,
 }
 
 std::vector<Feature> Quantile_Regressor::candidate_regression(
-    const Mat &X, const Mat &Q_global, crVec &y,
+    const Mat &X, const Mat &Q_global, const Vec &y,
     const std::vector<Feature> &used_features) const {
   // get used indices of used_features
   std::vector<int> used_indices;
@@ -131,7 +131,7 @@ std::vector<Feature> Quantile_Regressor::candidate_regression(
 }
 
 bool Quantile_Regressor::tolerance_check(
-    const Mat &X, crVec &y, const std::vector<Feature> &best_features) const {
+    const Mat &X, const Vec &y, const std::vector<Feature> &best_features) const {
   Vec y_pred = predict(X, best_features);
   Vec diff = y - y_pred;
   uint32_t N_samples = y.rows();

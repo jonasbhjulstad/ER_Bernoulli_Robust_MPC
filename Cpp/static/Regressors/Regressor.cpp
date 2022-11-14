@@ -16,7 +16,7 @@ namespace FROLS::Regression {
         Mat A = Mat::Zero(N_features, N_features);
         Vec g = Vec::Zero(N_features);
         std::vector<Feature> best_features;
-        best_features.reserve(N_terms_max);
+        // best_features.reserve(N_terms_max);
         uint32_t end_idx = N_features;
 
         // fmt::print("Max features: {}\n", N_terms_max);
@@ -76,7 +76,7 @@ namespace FROLS::Regression {
 
     }
 
-    Feature Regressor::best_feature_select(const Mat &X, const Mat& Q_global, crVec &y, const std::vector<Feature> &used_features) const {
+    Feature Regressor::best_feature_select(const Mat &X, const Mat& Q_global, const Vec &y, const std::vector<Feature> &used_features) const {
         const std::vector<Feature> candidates = candidate_regression(X, Q_global, y, used_features);
         std::vector<Feature> thresholded_candidates;
         std::copy_if(candidates.begin(), candidates.end(), std::back_inserter(thresholded_candidates),
@@ -103,7 +103,7 @@ namespace FROLS::Regression {
         return res;
     }
 
-    std::vector<Feature> Regressor::fit(const Mat &X, crVec &y) {
+    std::vector<Feature> Regressor::fit(const Mat &X, const Vec &y) {
         if ((X.rows() != y.rows())) {
             throw std::invalid_argument("X, U and y must have same number of rows");
         }
@@ -132,7 +132,7 @@ namespace FROLS::Regression {
     };
 
 
-    std::vector<Feature> Regressor::transform_fit(const Mat &X_raw, const Mat &U_raw, crVec &y,
+    std::vector<Feature> Regressor::transform_fit(const Mat &X_raw, const Mat &U_raw, const Vec &y,
                                   Features::Feature_Model &model) {
         Mat XU(X_raw.rows(), X_raw.cols() + U_raw.cols());
         XU << X_raw, U_raw;

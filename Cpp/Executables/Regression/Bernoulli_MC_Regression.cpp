@@ -1,5 +1,4 @@
-#define COIN_DEBUG
-
+// #define COIN_DEBUG
 #include "../Generate/Bernoulli_SIR_MC_Dynamic.hpp"
 #include <quantiles.hpp>
 #include <FROLS_Path_Config.hpp>
@@ -33,7 +32,7 @@ std::string quantile_simulation_filename(uint32_t N_pop, float p_ER, uint32_t it
 }
 
 constexpr uint32_t Nt = 50;
-constexpr uint32_t N_sims = 50;
+constexpr uint32_t N_sims = 500;
 const std::string network_type = "SIR";
 void simulation_loop(uint32_t N_pop, float p_ER)
 {
@@ -64,24 +63,24 @@ void simulation_loop(uint32_t N_pop, float p_ER)
                   { return rd(); });
     auto enum_seeds = enumerate(seeds);
 
+    const std::vector<std::string> colnames_x = {"S", "I", "R"};
+    const std::vector<std::string> colnames_u = {"p_I"};
+    const std::vector<std::string> colnames_X = {"S", "I", "R", "p_I"};
+
 
     auto trajectories = MC_SIR_simulations(N_pop, p_ER, p.p_I0, seeds, Nt, N_sims);
 
     std::for_each(trajectories.begin(), trajectories.end(), [&, n = 0](const auto &simdata) mutable
                   { traj_to_file(p, simdata, n++, Nt); });
 
-    const std::vector<std::string> colnames_x = {"S", "I", "R"};
-    const std::vector<std::string> colnames_u = {"p_I"};
-    const std::vector<std::string> colnames_X = {"S", "I", "R", "p_I"};
     auto q_fname_f = std::bind(quantile_filename, p.N_pop, p.p_ER, _1, "SIR");
     quantiles_to_file(p.N_sim, colnames_X, MC_fname_f, q_fname_f);
-
     // mark end timestamp
     auto end = std::chrono::high_resolution_clock::now();
     // print time
     uint32_t N_terms_max = 2;
     uint32_t d_max = 1;
-    uint32_t N_output_features = 80;
+    uint32_t N_output_features = 30;
     uint32_t Nu = 1;
     uint32_t Nx = 3;
     FROLS::Regression::Regressor_Param er_param;
@@ -125,10 +124,10 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     er_model.feature_summary(er_features);
 
 
-    X = dataframe_to_matrix(dfs, colnames_x,
-                            0, -2);
-    Y = dataframe_to_matrix(dfs, colnames_x, 1, -1) - X;
-    U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
+    // X = dataframe_to_matrix(dfs, colnames_x,
+    //                         0, -2);
+    // Y = dataframe_to_matrix(dfs, colnames_x, 1, -1) - X;
+    // U = dataframe_to_matrix(dfs, colnames_u, 0, -2);
 
 
     std::vector<FROLS::Regression::Quantile_Regressor> qr_regressors;
@@ -190,19 +189,20 @@ void simulation_loop(uint32_t N_pop, float p_ER)
     //convert p_ER to string with 1 decimal place
     std::string p_ER_str = fmt::format("{:.1f}", p.p_ER);
     er_model.write_csv(path_dirname(er_outfile_f(0).c_str()) + std::string("/param.csv"), er_features);
-    er_model.write_latex(er_features, FROLS_DATA_DIR+ std::string("/latex/er_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
+    // er_model.write_latex(er_features, FROLS_DATA_DIR+ std::string("/latex/er_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
 
     qr_model.write_csv(path_dirname(qr_outfile_f(0).c_str()) + std::string("/param.csv"), qr_features);
-    qr_model.write_latex(qr_features, FROLS_DATA_DIR+ std::string("/latex/qr_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
+    // qr_model.write_latex(qr_features, FROLS_DATA_DIR+ std::string("/latex/qr_param_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex", latex_colnames_x, latex_colnames_u, latex_colnames_y);
     std::cout << "Time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
 
-    std::ofstream er_file(FROLS_DATA_DIR+ std::string("/latex/ERR_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex");
-    std::ofstream qr_file(FROLS_DATA_DIR+ std::string("/latex/MAE_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex");
-    for (int i = 0; i < 3; i++)
-    {
-        er_file << fmt::format("{:.2e}", er_features[i].back().f_ERR) << ",";
-        qr_file << fmt::format("{:.2e}", qr_features[i].back().f_ERR) << ",";
-    }
+    // std::ofstream er_file(FROLS_DATA_DIR+ std::string("/latex/ERR_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex");
+    // std::ofstream qr_file(FROLS_DATA_DIR+ std::string("/latex/MAE_") + std::to_string(N_pop) + "_" + p_ER_str + ".tex");
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     if ()
+    //     er_file << fmt::format("{:.2e}", er_features[i].back().f_ERR) << ",";
+    //     qr_file << fmt::format("{:.2e}", qr_features[i].back().f_ERR) << ",";
+    // }
 
 }
 

@@ -10,7 +10,7 @@
 
 namespace FROLS {
 
-    void DataFrame::assign(const std::string &col_name, crVec &vec) {
+    void DataFrame::assign(const std::string &col_name, const Vec &vec) {
         assign(col_name, std::vector<float>(vec.data(), vec.data() + vec.rows()));
     }
 
