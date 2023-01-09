@@ -2,23 +2,21 @@
 #define SYCL_GRAPH_BUFFER_ROUTINES_HPP
 #include <CL/sycl.hpp>
 #include <vector>
-namespace Sycl_Graph
+namespace Sycl_Graph::Sycl
 {
-    template <typename T>
-    inline void host_buffer_copy(cl::sycl::buffer<T, 1>& buf, const std::vector<T>& vec, cl::sycl::handler& h)
+    template <typename T, typename uI_t = size_t>
+    inline void host_buffer_copy(cl::sycl::buffer<T, 1>& buf, const std::vector<T>& vec, cl::sycl::queue& q, uI_t offset = 0)
     {
-        h.parallel_for(vec.size(), [=](sycl::id<1> i)
+        //create buffer for vec
+        cl::sycl::buffer<T, 1> vec_buf(vec.data(), vec.size());
+        q.submit([&](cl::sycl::handler& h)
         {
-            buf[i] = vec[i];
-        });
-    }
-    template <typename T, typename uI_t>
-    inline void host_buffer_add(cl::sycl::buffer<T, 1>& buf, const std::vector<T>& vec, cl::sycl::handler& h, uI_t offset = 0)
-    {
+        auto vec_acc = vec_buf.template get_access<sycl::access::mode::read>(h);
         auto acc = buf.template get_access<sycl::access::mode::write>(h);
         h.parallel_for(vec.size(), [=](sycl::id<1> i)
         {
-            acc[i + offset] += vec[i];
+            acc[i + offset] = vec_acc[i];
+        });
         });
     }
 }

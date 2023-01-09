@@ -1,7 +1,7 @@
 #ifndef SYCL_GRAPH_SIR_BERNOULLI_TYPES_HPP
 #define SYCL_GRAPH_SIR_BERNOULLI_TYPES_HPP
 #include <stdint.h>
-
+#include <CL/sycl.hpp>
 namespace Sycl_Graph::Network_Models {
 enum SIR_Individual_State: int { SIR_INDIVIDUAL_S = 0, SIR_INDIVIDUAL_I = 1, SIR_INDIVIDUAL_R = 2 };
 struct SIR_Edge {};
@@ -12,4 +12,7 @@ template <typename dType = float> struct SIR_Bernoulli_Param {
   uint32_t N_I_min = 0;
 };
 } // namespace Network_Models
+template <>
+struct sycl::is_device_copyable<Sycl_Graph::Network_Models::SIR_Edge>: std::true_type {};
+
 #endif

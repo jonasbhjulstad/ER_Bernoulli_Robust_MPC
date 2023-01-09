@@ -28,18 +28,18 @@
 namespace Sycl_Graph::Sycl
 {
   
-      template <typename V, typename E, std::unsigned_integral uI_t>
+  template <typename V, typename E, std::unsigned_integral uI_t>
   struct Graph
   {
     // create copy constructor
     Graph(Graph &other) = default;
     Graph(cl::sycl::queue &q, uI_t NV, uI_t NE, const cl::sycl::property_list &props = {})
-        : q(q), vertex_buf(NV, props), edge_buf(NE, props)
+        : q(q), vertex_buf(NV, q, props), edge_buf(NE, q, props)
     {
     }
 
     Graph(cl::sycl::queue &q, const std::vector<Vertex<V, uI_t>>& vertices, const std::vector<Edge<E, uI_t>>& edges, const cl::sycl::property_list &props = {})
-        : Graph(q), vertex_buf(vertices, props), edge_buf(edges, props)
+        : Graph(q), vertex_buf(vertices, q, props), edge_buf(edges, q, props)
     {
     }
     cl::sycl::queue &q;
@@ -74,7 +74,6 @@ namespace Sycl_Graph::Sycl
     }
 
 
-    //perfect forward methods of buffers
 
     template <cl::sycl::access::mode mode>
     auto get_vertex_access(sycl::handler &h)
@@ -88,29 +87,34 @@ namespace Sycl_Graph::Sycl
       return edge_buf.template get_access<mode>(h);
     }
 
-    template <typename... Args>
-    void add_vertex(Args &&... args)
+    void add(const std::vector<Vertex<V, uI_t>> &vertices)
     {
-      vertex_buf.add(std::forward<Args>(args)...);
+      vertex_buf.add(vertices);
     }
 
-    template <typename... Args>
-    void add_edge(Args &&... args)
+    void add(const std::vector<uI_t> &ids, const std::vector<V> &v_data)
     {
-      edge_buf.add(std::forward<Args>(args)...);
+      vertex_buf.add(ids, v_data);
     }
 
-    template <typename... Args>
-    void remove_vertex(Args &&... args)
+    void remove(const std::vector<uI_t> &id)
     {
-      vertex_buf.remove(std::forward<Args>(args)...);
+      vertex_buf.remove(id);
+    }
+    void remove(const std::vector<uI_t> &to, const std::vector<uI_t> &from)
+    {
+      edge_buf.remove(to, from);
     }
 
-    template <typename... Args>
-    void remove_edge(Args &&... args)
+    void add(const std::vector<uI_t> &to, const std::vector<uI_t> &from, const std::vector<E> &e_data)
     {
-      edge_buf.remove(std::forward<Args>(args)...);
+      edge_buf.add(to, from, e_data);
     }
+    void add(const std::vector<Edge<E, uI_t>> &edges)
+    {
+      edge_buf.add(edges);
+    }
+
 
     template <typename... Args>
     void assign_vertex(Args &&... args)
